@@ -1,0 +1,15 @@
+main.jsx
+   ↓
+AuthProvider
+   ↓
+App.jsx
+   ↓
+RouterProvider
+   ↓
+router.jsx
+   ↓
+ProtectedRoute
+   ↓
+MainLayout
+   ↓
+Pages

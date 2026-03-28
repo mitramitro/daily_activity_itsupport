@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0061ff; /* Biru Profesional */
+  --color-primary-dark: #004ecc;
+  --color-bg-light: #f0f7ff;
+}
+
+html,
+body,
+#root {
+  background-color: var(--color-bg-light);
+  height: 100%;
+}
