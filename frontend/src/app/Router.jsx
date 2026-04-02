@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../modules/auth/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import DashboardPage from "../modules/dashboard/pages/DashboardPage";
@@ -8,6 +8,8 @@ import TaskListPage from "../modules/task/pages/TaskListPage";
 import TaskCreatePage from "../modules/task/pages/TaskCreatePage";
 import EmployeesPage from "../modules/employees/pages/EmployeesPage";
 import ProfilePage from "../modules/profile/pages/ProfilePage";
+import ReportsPage from "../modules/reports/pages/ReportsPage";
+import ReportTaskPage from "../modules/reports/pages/ReportTaskPage";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +36,8 @@ export const router = createBrowserRouter([
       { path: "employees", element: <EmployeesPage /> },
       { path: "/login", element: <LoginPage /> },
       { path: "profile", element: <ProfilePage /> },
+      { path: "/reports", element: <ReportsPage /> },
+      { path: "/reports/tasks", element: <ReportTaskPage /> },
     ],
   },
 ]);

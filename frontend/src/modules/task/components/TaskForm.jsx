@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import { createTaskWithPhoto, getEmployees, getOffices } from "../services/TaskService";
+import { createTaskWithPhoto, updateTask, getEmployees, getOffices } from "../services/TaskService";
+import { getImageUrl } from "../../../services/api";
 
-export default function TaskForm({ onSuccess }) {
+export default function TaskForm({ onSuccess, initialData }) {
   const [loading, setLoading] = useState(false);
 
   const [employees, setEmployees] = useState([]);
   const [offices, setOffices] = useState([]);
+
+  const isEditMode = !!initialData;
 
   const kategoriOptions = [
     { value: "PC", label: "PC" },
@@ -29,12 +32,13 @@ export default function TaskForm({ onSuccess }) {
     kendala: "",
     solusi: "",
     tanggal: "",
+    status: "in_progress",
   });
 
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState([]);
 
-  // 🔥 ambil data
+  // 🔥 fetch data
   useEffect(() => {
     fetchEmployees();
     fetchOffices();
@@ -58,7 +62,29 @@ export default function TaskForm({ onSuccess }) {
     }
   };
 
-  // 🔹 mapping options
+  // 🔥 set data saat edit
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        employee_id: initialData.employee?.id || "",
+        office_id: initialData.office?.id || "",
+        kategori: initialData.kategori || "",
+        jenis_task: initialData.jenis_task || "incident",
+        kendala: initialData.kendala || "",
+        solusi: initialData.solusi || "",
+        tanggal: initialData.tanggal || "",
+        status: initialData.status || "in_progress	",
+      });
+
+      // preview foto lama
+      if (initialData.photos) {
+        const existingPhotos = initialData.photos.map((p) => getImageUrl(p.photo));
+        setPreview(existingPhotos);
+      }
+    }
+  }, [initialData]);
+
+  // 🔹 options mapping
   const employeeOptions = employees.map((e) => ({
     value: e.id,
     label: e.nama,
@@ -69,40 +95,22 @@ export default function TaskForm({ onSuccess }) {
     label: o.name,
   }));
 
-  // 🔹 style react-select
+  // 🔹 style select
   const customSelectStyle = {
     control: (base, state) => ({
       ...base,
-      backgroundColor: "#f9fafb",
+      backgroundColor: isEditMode ? "#f3f4f6" : "#f9fafb",
       border: "none",
       boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
       borderRadius: "8px",
       minHeight: "38px",
     }),
-    menu: (base) => ({
-      ...base,
-      borderRadius: "8px",
-      overflow: "hidden",
-      zIndex: 9999,
-    }),
-    menuList: (base) => ({
-      ...base,
-      maxHeight: "200px",
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? "#eff6ff" : "white",
-      color: "#111827",
-      cursor: "pointer",
-    }),
   };
 
-  // 🔹 change handler
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 upload
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
 
@@ -118,100 +126,104 @@ export default function TaskForm({ onSuccess }) {
     setPreview((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // 🔹 submit
+  // 🔥 submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(form);
+
     try {
       setLoading(true);
 
-      const formData = new FormData();
+      if (isEditMode) {
+        await updateTask(initialData.id, form);
+      } else {
+        const formData = new FormData();
 
-      Object.keys(form).forEach((key) => {
-        formData.append(key, form[key]);
-      });
+        Object.keys(form).forEach((key) => {
+          formData.append(key, form[key]);
+        });
 
-      files.forEach((file) => {
-        formData.append("photos[]", file);
-      });
+        files.forEach((file) => {
+          formData.append("photos[]", file);
+        });
 
-      await createTaskWithPhoto(formData);
+        await createTaskWithPhoto(formData);
+      }
 
-      alert("Task berhasil dibuat");
+      alert("Task berhasil disimpan");
       onSuccess && onSuccess();
     } catch (err) {
-      //   console.error(err);
       console.log(err.response?.data);
-      alert("Gagal membuat task");
+      alert("Gagal menyimpan task");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm max-w-2xl">
-      <h2 className="text-lg font-semibold mb-6">Create Task</h2>
-
+    <div className="bg-white p-6 rounded-xl shadow-sm">
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* EMPLOYEE */}
         <div>
           <label className="text-xs text-gray-500 mb-1 block">Employee</label>
-          <Select options={employeeOptions} placeholder="Pilih Employee..." onChange={(selected) => setForm({ ...form, employee_id: selected?.value })} styles={customSelectStyle} />
+          <Select
+            options={employeeOptions}
+            value={employeeOptions.find((opt) => opt.value === form.employee_id)}
+            onChange={(selected) => setForm({ ...form, employee_id: selected?.value })}
+            isDisabled={isEditMode}
+            styles={customSelectStyle}
+          />
         </div>
 
         {/* OFFICE */}
         <div>
           <label className="text-xs text-gray-500 mb-1 block">Office</label>
-          <Select options={officeOptions} placeholder="Pilih Office..." onChange={(selected) => setForm({ ...form, office_id: selected?.value })} styles={customSelectStyle} />
+          <Select options={officeOptions} value={officeOptions.find((opt) => opt.value === form.office_id)} onChange={(selected) => setForm({ ...form, office_id: selected?.value })} isDisabled={isEditMode} styles={customSelectStyle} />
         </div>
 
         {/* ROW */}
         <div className="grid grid-cols-2 gap-3">
           {/* KATEGORI */}
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Kategori</label>
-            <Select options={kategoriOptions} placeholder="Pilih..." onChange={(selected) => setForm({ ...form, kategori: selected?.value })} styles={customSelectStyle} />
-          </div>
+          <Select options={kategoriOptions} value={kategoriOptions.find((opt) => opt.value === form.kategori)} onChange={(selected) => setForm({ ...form, kategori: selected?.value })} isDisabled={isEditMode} styles={customSelectStyle} />
 
-          {/* JENIS TASK */}
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Jenis</label>
-            <Select options={jenisOptions} defaultValue={jenisOptions[0]} onChange={(selected) => setForm({ ...form, jenis_task: selected?.value })} styles={customSelectStyle} />
-          </div>
+          {/* JENIS */}
+          <Select options={jenisOptions} value={jenisOptions.find((opt) => opt.value === form.jenis_task)} onChange={(selected) => setForm({ ...form, jenis_task: selected?.value })} isDisabled={isEditMode} styles={customSelectStyle} />
         </div>
 
-        {/* DATE */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Tanggal</label>
-          <input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} className="w-full bg-gray-50 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" />
-        </div>
+        {/* STATUS (editable) */}
+        {isEditMode && (
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Status</label>
+            <select name="status" value={form.status} onChange={handleChange} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm">
+              <option value="in_progress">In Progress</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+        )}
+
+        {/* TANGGAL */}
+        <input type="date" name="tanggal" value={form.tanggal} onChange={handleChange} disabled={isEditMode} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm" />
 
         {/* KENDALA */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Kendala</label>
-          <textarea name="kendala" value={form.kendala} onChange={handleChange} rows="3" className="w-full bg-gray-50 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" />
-        </div>
+        <label className="text-xs text-gray-500 mb-1 block">Kendala</label>
+        <textarea name="kendala" value={form.kendala} onChange={handleChange} rows="3" className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm" />
 
         {/* SOLUSI */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Solusi</label>
-          <textarea name="solusi" value={form.solusi} onChange={handleChange} rows="2" className="w-full bg-gray-50 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" />
-        </div>
+        <label className="text-xs text-gray-500 mb-1 block">Solusi</label>
+        <textarea name="solusi" value={form.solusi} onChange={handleChange} rows="2" className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm" />
 
         {/* FOTO */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Upload Foto</label>
-          <input type="file" multiple onChange={handleFileChange} className="text-sm" />
-        </div>
+        {!isEditMode && <input type="file" multiple onChange={handleFileChange} />}
 
         {/* PREVIEW */}
-        {preview.length > 0 && (
+        {/* PREVIEW (hanya CREATE) */}
+        {!isEditMode && preview.length > 0 && (
           <div className="flex gap-2 flex-wrap">
             {preview.map((src, i) => (
               <div key={i} className="relative">
-                <img src={src} className="w-20 h-20 object-cover rounded-lg" />
+                <img src={src} className="w-20 h-20 object-cover rounded" />
 
-                {/* tombol hapus */}
+                {/* 🔥 tombol delete */}
                 <button type="button" onClick={() => removeImage(i)} className="absolute -top-1 -right-1 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                   ×
                 </button>
@@ -221,11 +233,9 @@ export default function TaskForm({ onSuccess }) {
         )}
 
         {/* BUTTON */}
-        <div className="pt-2">
-          <button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
-            {loading ? "Saving..." : "Save Task"}
-          </button>
-        </div>
+        <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded">
+          {loading ? "Saving..." : "Save Task"}
+        </button>
       </form>
     </div>
   );

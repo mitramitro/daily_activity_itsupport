@@ -1,5 +1,5 @@
 import ModuleCard from "../../../components/ModulCard";
-import { ClipboardList, Users, Box, Network, Wifi, Radio } from "lucide-react";
+import { ClipboardList, Users, Box, Network, Wifi, Radio, BarChart } from "lucide-react";
 
 export default function DashboardPage() {
   return (
@@ -31,6 +31,8 @@ export default function DashboardPage() {
           <ModuleCard title="Task" desc="Kelola pekerjaan IT" link="/tasks" icon={<ClipboardList size={28} />} />
 
           <ModuleCard title="Employees" desc="Data pekerja" link="/employees" icon={<Users size={28} />} />
+
+          <ModuleCard title="Report" desc="Export & Lihat semua laporan" link="/reports" icon={<BarChart size={28} />} />
 
           <ModuleCard title="Inventory" desc="Barang masuk / keluar" link="/inventory" icon={<Box size={28} />} />
 

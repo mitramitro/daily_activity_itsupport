@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { getTasks, exportTasks } from "../services/TaskService";
+import { getTasks } from "../services/TaskService";
 import TaskTable from "../components/TaskTable";
 import TaskCard from "../components/TaskCard";
 import TaskPagination from "../components/TaskPagination";
 import TaskFilter from "../components/TaskFilter";
 import TaskDetailModal from "../components/TaskDetailModal";
+import FloatingButton from "../../../components/FloatingButton";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function TaskListPage() {
+  const navigate = useNavigate();
+
   const [tasks, setTasks] = useState([]);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,8 +20,10 @@ export default function TaskListPage() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-  const [tanggalDari, setTanggalDari] = useState("");
-  const [tanggalSampai, setTanggalSampai] = useState("");
+
+  // 🔥 NEW: jenis task filter
+  const [jenisTask, setJenisTask] = useState("");
+
   const [selectedTask, setSelectedTask] = useState(null);
 
   const fetchData = async () => {
@@ -27,8 +34,7 @@ export default function TaskListPage() {
         page,
         search,
         status,
-        tanggal_dari: tanggalDari,
-        tanggal_sampai: tanggalSampai,
+        jenis_task: jenisTask, // 🔥 tambah ini
       });
 
       setTasks(res.data.data.data);
@@ -41,39 +47,19 @@ export default function TaskListPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [page]);
+    const delay = setTimeout(() => {
+      fetchData();
+    }, 500);
 
-  const handleFilter = () => {
-    if (tanggalDari && tanggalSampai && tanggalDari > tanggalSampai) {
-      alert("Tanggal tidak valid");
-      return;
-    }
+    return () => clearTimeout(delay);
+  }, [page, jenisTask, search, status]);
 
+  useEffect(() => {
     setPage(1);
-    fetchData();
-  };
+  }, [search, status, jenisTask]);
 
-  const handleExport = async () => {
-    try {
-      const res = await exportTasks({
-        search,
-        status,
-        tanggal_dari: tanggalDari,
-        tanggal_sampai: tanggalSampai,
-      });
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.setAttribute("download", "tasks.xlsx");
-      document.body.appendChild(link);
-      link.click();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // 🔥 FILTER STATUS (hanya active)
+  const filteredTasks = tasks.filter((task) => task.status === "pending" || task.status === "in_progress");
 
   return (
     <div className="p-4">
@@ -81,9 +67,20 @@ export default function TaskListPage() {
         {/* HEADER */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-lg font-semibold">Task List</h1>
+        </div>
 
-          <button onClick={handleExport} className="bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 rounded text-sm hover:bg-green-100">
-            Export
+        {/* 🔥 JENIS TASK FILTER (BUTTON) */}
+        <div className="flex gap-2 mb-4">
+          <button onClick={() => setJenisTask("")} className={`px-3 py-1 rounded text-sm ${jenisTask === "" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            All
+          </button>
+
+          <button onClick={() => setJenisTask("incident")} className={`px-3 py-1 rounded text-sm ${jenisTask === "incident" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            Incident
+          </button>
+
+          <button onClick={() => setJenisTask("request")} className={`px-3 py-1 rounded text-sm ${jenisTask === "request" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            Request
           </button>
         </div>
 
@@ -93,42 +90,35 @@ export default function TaskListPage() {
           setSearch={setSearch}
           status={status}
           setStatus={setStatus}
-          tanggalDari={tanggalDari}
-          setTanggalDari={setTanggalDari}
-          tanggalSampai={tanggalSampai}
-          setTanggalSampai={setTanggalSampai}
-          onFilter={handleFilter}
+          showAdvanced={false} // 🔥 sembunyikan filter selain search
         />
 
         {/* LOADING */}
         {loading && <div className="text-sm text-gray-500 mb-3">Loading...</div>}
 
         {/* EMPTY */}
-        {!loading && tasks.length === 0 && <div className="text-sm text-gray-400 text-center py-6">Tidak ada data</div>}
+        {!loading && filteredTasks.length === 0 && <div className="text-sm text-gray-400 text-center py-6">Tidak ada data</div>}
 
         {/* MOBILE */}
         <div className="grid gap-3 md:hidden">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} onDetail={setSelectedTask} />
           ))}
         </div>
 
         {/* DESKTOP */}
         <div className="hidden md:block">
-          <TaskTable tasks={tasks} onDetail={setSelectedTask} />
+          <TaskTable tasks={filteredTasks} onDetail={setSelectedTask} />
         </div>
 
         {/* PAGINATION */}
         <TaskPagination meta={meta} onPageChange={setPage} />
       </div>
 
-      {selectedTask && (
-        <TaskDetailModal
-          key={selectedTask.id} // 🔥 penting
-          task={selectedTask}
-          onClose={() => setSelectedTask(null)}
-        />
-      )}
+      {selectedTask && <TaskDetailModal task={selectedTask} onClose={() => setSelectedTask(null)} onUpdated={fetchData} />}
+
+      {/* FLOATING BUTTON */}
+      {/* <FloatingButton icon={<Plus size={24} />} onClick={() => navigate("/tasks/create")} /> */}
     </div>
   );
 }

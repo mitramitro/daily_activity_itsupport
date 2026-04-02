@@ -24,6 +24,18 @@ export const createTaskWithPhoto = (formData) => {
   });
 };
 
+export const uploadTaskPhotos = (id, formData) => {
+  return api.post(`/tasks/${id}/photos`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const deleteTaskPhoto = (photoId) => {
+  return api.delete(`/task-photos/${photoId}`);
+};
+
 // UPDATE
 export const updateTask = (id, data) => {
   return api.put(`/tasks/${id}`, data);
@@ -42,11 +54,4 @@ export const getEmployees = () => {
 // 🔹 ambil office
 export const getOffices = () => {
   return api.get("/offices");
-};
-
-export const exportTasks = (params) => {
-  return api.get("/tasks/export", {
-    params,
-    responseType: "blob",
-  });
 };

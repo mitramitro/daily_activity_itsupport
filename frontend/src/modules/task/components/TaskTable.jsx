@@ -1,6 +1,6 @@
 import TaskStatusBadge from "./TaskStatusBadge";
 
-export default function TaskTable({ tasks }) {
+export default function TaskTable({ tasks, onDetail }) {
   return (
     <table className="min-w-full text-sm">
       <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
@@ -30,7 +30,9 @@ export default function TaskTable({ tasks }) {
             <td className="px-4 py-3">{task.tanggal}</td>
 
             <td className="px-4 py-3 text-right">
-              <button className="text-gray-500 hover:text-black mr-3">...</button>
+              <button onClick={() => onDetail(task)} className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs hover:bg-gray-100">
+                ...
+              </button>
             </td>
           </tr>
         ))}

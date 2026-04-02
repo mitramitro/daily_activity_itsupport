@@ -1,4 +1,4 @@
-export default function TaskFilter({ search, setSearch, status, setStatus, tanggalDari, setTanggalDari, tanggalSampai, setTanggalSampai, onFilter }) {
+export default function TaskFilter({ search, setSearch, status, setStatus, tanggalDari, setTanggalDari, tanggalSampai, setTanggalSampai, onFilter, showAdvanced = true }) {
   return (
     <div className="space-y-3 mb-4">
       {/* SEARCH */}
@@ -8,22 +8,26 @@ export default function TaskFilter({ search, setSearch, status, setStatus, tangg
 
       {/* FILTER */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="border px-3 py-2 rounded text-sm">
-          <option value="">Semua Status</option>
-          <option value="pending">Pending</option>
-          <option value="in_progress">Progress</option>
-          <option value="resolved">Resolved</option>
-        </select>
+        {showAdvanced && (
+          <>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border px-3 py-2 rounded text-sm">
+              <option value="">Semua Status</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
 
-        <input type="date" value={tanggalDari} onChange={(e) => setTanggalDari(e.target.value)} className="border px-3 py-2 rounded text-sm" />
+            <input type="date" value={tanggalDari} onChange={(e) => setTanggalDari(e.target.value)} className="border px-3 py-2 rounded text-sm" />
 
-        <input type="date" value={tanggalSampai} onChange={(e) => setTanggalSampai(e.target.value)} className="border px-3 py-2 rounded text-sm" />
+            <input type="date" value={tanggalSampai} onChange={(e) => setTanggalSampai(e.target.value)} className="border px-3 py-2 rounded text-sm" />
 
-        <div></div>
+            <div></div>
 
-        <button onClick={onFilter} className="bg-blue-600 text-white px-4 py-2 rounded text-sm">
-          Filter
-        </button>
+            <button onClick={onFilter} className="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+              Filter
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

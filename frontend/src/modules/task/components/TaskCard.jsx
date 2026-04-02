@@ -15,7 +15,7 @@ export default function TaskCard({ task, onDetail }) {
 
       <div className="text-[11px] text-gray-500 space-y-0.5">
         <p>👤 {task.employee?.nama}</p>
-        <p>📍 Office {task.office_id}</p>
+        <p>📍 {task.office?.name || "-"}</p>
         <p>📅 {task.tanggal}</p>
       </div>
 
