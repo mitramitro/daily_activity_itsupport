@@ -193,7 +193,7 @@ export default function TaskForm({ onSuccess, initialData }) {
         {isEditMode && (
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Status</label>
-            <select name="status" value={form.status} onChange={handleChange} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm">
+            <select name="status" value={form.status} disabled onChange={handleChange} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm">
               <option value="in_progress">In Progress</option>
               <option value="pending">Pending</option>
               <option value="resolved">Resolved</option>

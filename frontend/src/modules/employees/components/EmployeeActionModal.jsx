@@ -2,18 +2,30 @@ export default function EmployeeActionModal({ open, onClose, onEdit, onDelete })
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50">
-      <div className="bg-white w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl p-4 space-y-3">
-        <button onClick={onEdit} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100">
+    <div
+      className="fixed inset-0 bg-black/30 z-50"
+      onClick={onClose} // 🔥 klik luar close
+    >
+      <div
+        className="absolute bottom-0 w-full bg-white rounded-t-2xl p-4 pb-20 max-h-[70vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()} // 🔥 biar gak nutup pas klik dalam
+      >
+        {/* handle */}
+        <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
+
+        {/* header */}
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-semibold">Aksi</h3>
+          <button onClick={onClose}>✕</button>
+        </div>
+
+        {/* action */}
+        <button onClick={onEdit} className="flex items-center gap-2 py-2 w-full">
           ✏️ Edit
         </button>
 
-        <button onClick={onDelete} className="w-full text-left px-4 py-3 rounded-xl text-red-600 hover:bg-red-50">
-          🗑️ Hapus
-        </button>
-
-        <button onClick={onClose} className="w-full text-center py-2 text-gray-500">
-          Batal
+        <button onClick={onDelete} className="flex items-center gap-2 py-2 w-full text-red-500">
+          🗑 Hapus
         </button>
       </div>
     </div>
