@@ -1,0 +1,13 @@
+import axios from "axios";
+
+import api from "../../../services/api";
+
+export const getDashboardSummary = async () => {
+  const res = await api.get("/dashboard/summary");
+  return res.data;
+};
+
+export const getRecentTasks = async () => {
+  const res = await api.get("/dashboard/recent");
+  return res.data;
+};

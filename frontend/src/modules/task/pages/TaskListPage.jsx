@@ -25,6 +25,11 @@ export default function TaskListPage() {
   const [jenisTask, setJenisTask] = useState("");
 
   const [selectedTask, setSelectedTask] = useState(null);
+  const [summary, setSummary] = useState(null);
+
+  const totalAll = summary?.total_all || 0;
+  const totalIncident = summary?.total_incident || 0;
+  const totalRequest = summary?.total_request || 0;
 
   const fetchData = async () => {
     try {
@@ -39,6 +44,7 @@ export default function TaskListPage() {
 
       setTasks(res.data.data.data);
       setMeta(res.data.data);
+      setSummary(res.data.summary);
     } catch (err) {
       console.error(err);
     } finally {
@@ -71,16 +77,16 @@ export default function TaskListPage() {
 
         {/* 🔥 JENIS TASK FILTER (BUTTON) */}
         <div className="flex gap-2 mb-4">
-          <button onClick={() => setJenisTask("")} className={`px-3 py-1 rounded text-sm ${jenisTask === "" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
-            All
+          <button onClick={() => setJenisTask("")} className={`px-3 py-1 rounded text-sm flex items-center gap-1 ${jenisTask === "" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            All <span className="text-xs">({totalAll})</span>
           </button>
 
-          <button onClick={() => setJenisTask("incident")} className={`px-3 py-1 rounded text-sm ${jenisTask === "incident" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
-            Incident
+          <button onClick={() => setJenisTask("incident")} className={`px-3 py-1 rounded text-sm flex items-center gap-1 ${jenisTask === "incident" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            Incident <span className="text-xs">({totalIncident})</span>
           </button>
 
-          <button onClick={() => setJenisTask("request")} className={`px-3 py-1 rounded text-sm ${jenisTask === "request" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
-            Request
+          <button onClick={() => setJenisTask("request")} className={`px-3 py-1 rounded text-sm flex items-center gap-1 ${jenisTask === "request" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+            Request <span className="text-xs">({totalRequest})</span>
           </button>
         </div>
 

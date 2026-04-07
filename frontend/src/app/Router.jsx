@@ -10,6 +10,7 @@ import EmployeesPage from "../modules/employees/pages/EmployeesPage";
 import ProfilePage from "../modules/profile/pages/ProfilePage";
 import ReportsPage from "../modules/reports/pages/ReportsPage";
 import ReportTaskPage from "../modules/reports/pages/ReportTaskPage";
+import UsersPage from "../modules/users/pages/UsersPage";
 
 export const router = createBrowserRouter([
   {
@@ -31,13 +32,19 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DashboardPage /> },
+
       { path: "tasks", element: <TaskListPage /> },
       { path: "tasks/create", element: <TaskCreatePage /> },
+
       { path: "employees", element: <EmployeesPage /> },
-      { path: "/login", element: <LoginPage /> },
+
+      // 🔥 NEW
+      { path: "users", element: <UsersPage /> },
+
       { path: "profile", element: <ProfilePage /> },
-      { path: "/reports", element: <ReportsPage /> },
-      { path: "/reports/tasks", element: <ReportTaskPage /> },
+
+      { path: "reports", element: <ReportsPage /> },
+      { path: "reports/tasks", element: <ReportTaskPage /> },
     ],
   },
 ]);

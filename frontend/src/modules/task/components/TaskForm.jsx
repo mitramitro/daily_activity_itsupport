@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { createTaskWithPhoto, updateTask, getEmployees, getOffices } from "../services/TaskService";
 import { getImageUrl } from "../../../services/api";
+import toast from "react-hot-toast";
 
 export default function TaskForm({ onSuccess, initialData }) {
   const [loading, setLoading] = useState(false);
@@ -73,7 +74,7 @@ export default function TaskForm({ onSuccess, initialData }) {
         kendala: initialData.kendala || "",
         solusi: initialData.solusi || "",
         tanggal: initialData.tanggal || "",
-        status: initialData.status || "in_progress	",
+        status: initialData.status || "in_progress",
       });
 
       // preview foto lama
@@ -149,11 +150,11 @@ export default function TaskForm({ onSuccess, initialData }) {
         await createTaskWithPhoto(formData);
       }
 
-      alert("Task berhasil disimpan");
+      toast.success("Task berhasil disimpan");
       onSuccess && onSuccess();
     } catch (err) {
       console.log(err.response?.data);
-      alert("Gagal menyimpan task");
+      toast.error("Gagal menyimpan task");
     } finally {
       setLoading(false);
     }
