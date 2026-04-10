@@ -11,6 +11,8 @@ import ProfilePage from "../modules/profile/pages/ProfilePage";
 import ReportsPage from "../modules/reports/pages/ReportsPage";
 import ReportTaskPage from "../modules/reports/pages/ReportTaskPage";
 import UsersPage from "../modules/users/pages/UsersPage";
+import InventoryPage from "../modules/inventory/pages/InventoryPage";
+import BarangPage from "../modules/inventory/pages/BarangPage";
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +47,8 @@ export const router = createBrowserRouter([
 
       { path: "reports", element: <ReportsPage /> },
       { path: "reports/tasks", element: <ReportTaskPage /> },
+      { path: "inventory", element: <InventoryPage /> },
+      { path: "barang", element: <BarangPage /> },
     ],
   },
 ]);

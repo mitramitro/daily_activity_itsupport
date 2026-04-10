@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUsers, createUser, updateUser, deleteUser, updateUserPassword } from "../services/usersService";
+import { getUsers, createUser, updateUser, deleteUser, updateUserPassword, getOffices } from "../services/usersService";
 
 import UserTable from "../components/UserTable";
 import UserPagination from "../components/UserPagination";
@@ -73,11 +73,13 @@ export default function UsersPage() {
         await createUser(data);
       }
 
-      closeModal();
       fetchUsers();
+      closeModal();
+      return true;
     } catch (err) {
       console.error(err);
       alert("Gagal menyimpan data");
+      throw err;
     }
   };
 
@@ -121,7 +123,7 @@ export default function UsersPage() {
       <UserPagination page={page} setPage={setPage} totalPages={totalPages} />
 
       {/* 🧾 USER FORM MODAL */}
-      <UserModal open={modal.type === "form"} onClose={closeModal} initialData={modal.data} currentUser={currentUser} onSuccess={handleSubmitUser} />
+      <UserModal open={modal.type === "form"} onClose={closeModal} initialData={modal.data} currentUser={currentUser} getOffices={getOffices} onSuccess={handleSubmitUser} />
 
       {/* ⚙️ ACTION MODAL */}
       <UserActionModal open={modal.type === "action"} onClose={closeModal} onEdit={() => openModal("form", modal.data)} onDelete={handleDelete} onChangePassword={() => openModal("password", modal.data)} />

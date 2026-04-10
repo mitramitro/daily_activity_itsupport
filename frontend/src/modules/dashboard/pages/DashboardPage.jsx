@@ -1,7 +1,8 @@
 import ModuleCard from "../../../components/ModulCard";
-import { ClipboardList, Users, Box, Network, Wifi, Radio, BarChart } from "lucide-react";
+import { ClipboardList, Users, Box, Network, Wifi, Radio, BarChart, UserCog } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getDashboardSummary, getRecentTasks } from "../services/DashboardService";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function DashboardPage() {
   const [recentTasks, setRecentTasks] = useState([]);
@@ -10,7 +11,7 @@ export default function DashboardPage() {
     pending: 0,
     progress: 0,
   });
-
+  const { user: currentUser } = useAuth();
   useEffect(() => {
     fetchSummary();
     fetchRecent();
@@ -83,6 +84,7 @@ export default function DashboardPage() {
 
           <ModuleCard title="Inventory" desc="Barang masuk / keluar" link="/inventory" icon={<Box size={28} />} />
 
+          {currentUser?.role === "admin" && <ModuleCard title="User Management" desc="Kelola user & akses" link="/users" icon={<UserCog size={28} />} />}
           {/* <ModuleCard title="IP Address" desc="Catatan IP cabang" link="/ip" icon={<Network size={28} />} />
 
           <ModuleCard title="Toner" desc="Monitoring toner" link="/toner" icon={<Wifi size={28} />} />

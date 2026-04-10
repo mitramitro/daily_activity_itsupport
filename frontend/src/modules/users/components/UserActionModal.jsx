@@ -34,16 +34,9 @@ export default function UserActionModal({ open, onClose, onEdit, onChangePasswor
   if (isMobile) {
     return (
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" onClick={onClose}>
-        <div
-          className="
-            absolute bottom-0 w-full bg-white rounded-t-2xl
-            p-4 pb-6 shadow-xl
-            animate-slideUp
-          "
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="absolute bottom-0 w-full bg-white rounded-t-2xl p-4 pb-20 max-h-[70vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           {/* Handle */}
-          <div className="w-10 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+          <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
 
           {/* Header */}
           <div className="flex justify-between items-center mb-4">

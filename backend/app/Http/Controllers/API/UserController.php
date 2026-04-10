@@ -26,22 +26,20 @@ class UserController extends Controller
         $search = $request->search;
         $limit  = $request->limit ?? 10;
 
-        $users = User::query()
-            ->select('id', 'name', 'email', 'role')
-
+        $users = User::with('office') // 🔥 relasi office
+            ->select('id', 'name', 'email', 'role', 'office_id')
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%$search%")
                         ->orWhere('email', 'like', "%$search%");
                 });
             })
-
             ->orderBy('name')
             ->paginate($limit);
 
         return response()->json([
             'status' => 'success',
-            'data' => $users->items(), // 🔥 ARRAY langsung
+            'data' => $users->items(),
             'meta' => [
                 'current_page' => $users->currentPage(),
                 'last_page' => $users->lastPage(),
@@ -60,17 +58,19 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role'     => ['required', Rule::in(['admin', 'user'])],
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required|string|min:6|confirmed',
+            'role'      => ['required', Rule::in(['admin', 'user'])],
+            'office_id' => 'required|exists:offices,id', // 🔥 tambahan
         ]);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role'     => $validated['role'],
+            'name'      => $validated['name'],
+            'email'     => $validated['email'],
+            'password'  => Hash::make($validated['password']),
+            'role'      => $validated['role'],
+            'office_id' => $validated['office_id'], // 🔥 tambahan
         ]);
 
         return response()->json([
@@ -99,6 +99,7 @@ class UserController extends Controller
                 Rule::unique('users', 'email')->ignore($id),
             ],
             'role'  => ['required', Rule::in(['admin', 'user'])],
+            'office_id' => 'required|exists:offices,id', // 🔥 tambahan
         ]);
 
         // ❌ cegah turunkan diri sendiri
@@ -108,7 +109,12 @@ class UserController extends Controller
             ], 403);
         }
 
-        $user->update($validated);
+        $user->update([
+            'name'      => $validated['name'],
+            'email'     => $validated['email'],
+            'role'      => $validated['role'],
+            'office_id' => $validated['office_id'], // 🔥 tambahan
+        ]);
 
         return response()->json([
             'status'  => 'success',
@@ -118,7 +124,7 @@ class UserController extends Controller
     }
 
     /**
-     * 🔐 UPDATE PASSWORD (SEPARATE FLOW)
+     * 🔐 UPDATE PASSWORD
      */
     public function updatePassword(Request $request, $id)
     {
@@ -143,7 +149,7 @@ class UserController extends Controller
     }
 
     /**
-     * 🗑 DELETE USER (OPTIONAL – DISARANKAN HIDE DI FE)
+     * 🗑 DELETE USER
      */
     public function destroy($id)
     {

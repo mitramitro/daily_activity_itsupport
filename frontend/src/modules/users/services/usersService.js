@@ -20,3 +20,6 @@ export const deleteUser = (id) => {
 export const updateUserPassword = (id, data) => {
   return api.put(`/users/${id}/password`, data);
 };
+export const getOffices = () => {
+  return api.get("/offices");
+};

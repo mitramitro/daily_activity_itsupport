@@ -1,17 +1,25 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import Select from "react-select";
 
-export default function UserForm({ onSubmit, onCancel, initialData, currentUser }) {
+export default function UserForm({ onSubmit, onCancel, initialData, currentUser, getOffices }) {
   const isEdit = !!initialData;
 
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [offices, setOffices] = useState([]);
+
+  const officeOptions = offices.map((office) => ({
+    value: office.id,
+    label: office.name,
+  }));
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     role: "user",
+    office_id: "",
   });
 
   const inputClass = "w-full bg-gray-50 rounded-xl px-3 py-2 text-sm outline-none transition focus:bg-white focus:ring-2 focus:ring-blue-500";
@@ -28,6 +36,7 @@ export default function UserForm({ onSubmit, onCancel, initialData, currentUser 
         email: initialData.email || "",
         password: "",
         role: initialData.role || "user",
+        office_id: initialData.office_id || "",
       });
     } else {
       setForm({
@@ -35,9 +44,23 @@ export default function UserForm({ onSubmit, onCancel, initialData, currentUser 
         email: "",
         password: "",
         role: "user",
+        office_id: "",
       });
     }
   }, [initialData, isEdit]);
+
+  useEffect(() => {
+    const fetchOffices = async () => {
+      try {
+        const res = await getOffices();
+        setOffices(res.data.data || res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchOffices();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,6 +99,7 @@ export default function UserForm({ onSubmit, onCancel, initialData, currentUser 
         name: form.name.trim(),
         email: form.email.trim(),
         role: form.role,
+        office_id: form.office_id,
       };
 
       if (!isEdit) {
@@ -95,6 +119,18 @@ export default function UserForm({ onSubmit, onCancel, initialData, currentUser 
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🔹 style select
+  const customSelectStyle = {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: "#f9fafb",
+      border: "none",
+      boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+      borderRadius: "8px",
+      minHeight: "38px",
+    }),
   };
 
   return (
@@ -127,6 +163,16 @@ export default function UserForm({ onSubmit, onCancel, initialData, currentUser 
           </div>
         </>
       )}
+
+      {/* OFFICE */}
+      <Select
+        options={officeOptions}
+        value={officeOptions.find((opt) => opt.value === form.office_id)}
+        onChange={(selected) => setForm({ ...form, office_id: selected?.value })}
+        placeholder="Pilih Office..."
+        isClearable
+        styles={customSelectStyle}
+      />
 
       {/* ROLE */}
       <div>

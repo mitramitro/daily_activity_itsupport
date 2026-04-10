@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\TaskPhotoController;
 use App\Http\Controllers\Api\OfficeController;
 use App\Http\Controllers\Api\ReportsController;
 use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\Api\BarangController;
+use App\Http\Controllers\Api\BarangLogController;
+use App\Http\Controllers\api\stockController;
 
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('register');
@@ -31,6 +34,29 @@ Route::middleware('jwt')->group(function () {
     Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
 
     Route::get('offices', [OfficeController::class, 'index']);
+    // ======================
+    // INVENTORY - BARANG
+    // ======================
+    Route::prefix('barang')->group(function () {
+        Route::get('/', [BarangController::class, 'index']);
+        Route::post('/', [BarangController::class, 'store']);
+        Route::get('{id}', [BarangController::class, 'show']);
+        Route::put('{id}', [BarangController::class, 'update']);
+        Route::delete('{id}', [BarangController::class, 'destroy']);
+    });
+
+    // ======================
+    // INVENTORY - LOG (INTI)
+    // ======================
+    Route::prefix('barang-logs')->group(function () {
+        Route::get('/', [BarangLogController::class, 'index']);
+        Route::post('/', [BarangLogController::class, 'store']);
+        Route::get('{id}', [BarangLogController::class, 'show']);
+        Route::delete('{id}', [BarangLogController::class, 'destroy']);
+    });
+
+    Route::get('/stocks', [stockController::class, 'index']);
+
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']); // register pindah sini

@@ -129,7 +129,7 @@ class AuthController extends Controller
     public function me()
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            $user = JWTAuth::parseToken()->authenticate()->load('office');
 
             return response()->json([
                 'status'  => 'success',

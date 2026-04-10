@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Office;
 
 
 class User extends Authenticatable implements JWTSubject
@@ -25,6 +26,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'role',
+        'office_id',
     ];
 
     /**
@@ -37,7 +39,10 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
-
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
+    }
 
     /**
      * Ambil identifier unik user yang akan disimpan di dalam JWT.
