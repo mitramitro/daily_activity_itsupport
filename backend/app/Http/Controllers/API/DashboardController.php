@@ -14,7 +14,12 @@ class DashboardController extends Controller
     public function summary()
     {
         $user = auth()->user();
-        $now = Carbon::now();
+        //$user = \App\Models\User::first(); // dummy
+        $now = now();
+
+        // 🔥 simpan range biar tidak hitung ulang
+        $start = $now->copy()->startOfMonth();
+        $end   = $now->copy()->endOfMonth();
 
         $query = Task::query();
 
@@ -23,29 +28,22 @@ class DashboardController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        // clone query biar tidak bentrok
-        $resolved = (clone $query)
-            ->whereMonth('created_at', $now->month)
-            ->whereYear('created_at', $now->year)
-            ->where('status', 'resolved')
-            ->count();
-
-        $pending = (clone $query)
-            ->whereMonth('created_at', $now->month)
-            ->whereYear('created_at', $now->year)
-            ->where('status', 'pending')
-            ->count();
-
-        $progress = (clone $query)
-            ->whereMonth('created_at', $now->month)
-            ->whereYear('created_at', $now->year)
-            ->where('status', 'in_progress')
-            ->count();
+        $summary = (clone $query)
+            ->where(function ($q) use ($start, $end) {
+                $q->whereBetween('created_at', [$start, $end])
+                    ->orWhereBetween('updated_at', [$start, $end]);
+            })
+            ->selectRaw("
+            COALESCE(SUM(status = 'resolved'), 0) as resolved,
+            COALESCE(SUM(status = 'pending'), 0) as pending,
+            COALESCE(SUM(status = 'in_progress'), 0) as progress
+        ")
+            ->first();
 
         return response()->json([
-            'resolved' => $resolved,
-            'pending' => $pending,
-            'progress' => $progress
+            'resolved' => (int) $summary->resolved,
+            'pending'  => (int) $summary->pending,
+            'progress' => (int) $summary->progress,
         ]);
     }
 

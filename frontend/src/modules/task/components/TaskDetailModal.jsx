@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { updateTask, uploadTaskPhotos, getTaskById, deleteTaskPhoto } from "../services/TaskService";
+import { updateTask, uploadTaskPhotos, getTaskById, deleteTaskPhoto, downloadTaskPhoto } from "../services/TaskService";
 import { getImageUrl } from "../../../services/api";
 
 export default function TaskDetailModal({ task, onClose, onUpdated }) {
@@ -85,6 +85,42 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
+  const handleDownloadPhoto = async (photoPath) => {
+    try {
+      const filename = photoPath.split("/").pop();
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(downloadTaskPhoto(filename), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal download");
+      }
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Gagal download foto");
+    }
+  };
+
+  const handlePreviewPhoto = (url) => {
+    window.open(url, "_blank");
+  };
+
   if (!localTask) return null;
 
   return (
@@ -153,7 +189,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
           </div>
 
           {/* FOTO */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <h3 className="text-sm font-semibold mb-2">Foto</h3>
 
             {localTask.photos?.length ? (
@@ -167,6 +203,54 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                     </button>
                   </div>
                 ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400">Tidak ada foto</p>
+            )}
+
+            <input type="file" multiple onChange={handleUploadPhoto} disabled={uploading} className="mt-2 text-sm" />
+
+            {uploading && <p className="text-xs text-blue-500 mt-1">Uploading...</p>}
+          </div> */}
+
+          {/* FOTO */}
+          <div className="mb-5">
+            <h3 className="text-sm font-semibold mb-2">Foto</h3>
+
+            {localTask.photos?.length ? (
+              <div className="flex flex-wrap gap-2">
+                {localTask.photos.map((p) => {
+                  const url = getImageUrl(p.photo);
+
+                  return (
+                    <div key={p.id} className="relative group">
+                      {/* IMAGE */}
+                      <img src={url} onClick={() => handlePreviewPhoto(url)} className="w-24 h-24 object-cover rounded-lg border cursor-pointer" />
+
+                      {/* DOWNLOAD BUTTON */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownloadPhoto(p.photo);
+                        }}
+                        className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-2 py-[2px] rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+                      >
+                        ⬇
+                      </button>
+
+                      {/* DELETE */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePhoto(p.id);
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 text-xs rounded-full"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-xs text-gray-400">Tidak ada foto</p>

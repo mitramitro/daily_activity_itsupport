@@ -1,4 +1,4 @@
-import api from "../../../services/api";
+import api, { BASE_URL } from "../../../services/api";
 
 // GET LIST
 export const getTasks = (params) => {
@@ -24,6 +24,12 @@ export const createTaskWithPhoto = (formData) => {
   });
 };
 
+// download foto
+export const downloadTaskPhoto = (filename) => {
+  return `${BASE_URL}/api/tasks/photo/download/${filename}`;
+};
+
+// upload foto
 export const uploadTaskPhotos = (id, formData) => {
   return api.post(`/tasks/${id}/photos`, formData, {
     headers: {

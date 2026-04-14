@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\TaskPhoto;
 use App\Models\TaskLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -17,7 +18,7 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $query = Task::with([
-            'employee:id,nama',
+            'employee:id,nama,nomor_pekerja,fungsi,jabatan',
             'user:id,name',
             'office:id,name',
             'photos:id,task_id,photo',
@@ -283,5 +284,18 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Task berhasil dihapus'
         ]);
+    }
+
+    public function downloadPhoto($filename)
+    {
+        $path = 'tasks/' . $filename;
+
+        if (!Storage::disk('public')->exists($path)) {
+            return response()->json([
+                'message' => 'File tidak ditemukan'
+            ], 404);
+        }
+
+        return Storage::disk('public')->download($path);
     }
 }

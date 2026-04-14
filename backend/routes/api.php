@@ -73,6 +73,8 @@ Route::middleware('jwt')->group(function () {
         Route::delete('{id}', [TaskController::class, 'destroy']);
         // 🔥 upload foto
         Route::post('{id}/photos', [TaskPhotoController::class, 'store']);
+        //download
+        Route::get('/photo/download/{filename}', [TaskController::class, 'downloadPhoto']);
     });
     Route::delete('/task-photos/{id}', [TaskPhotoController::class, 'destroy']);
     Route::get('/reports/tasks/export', [ReportsController::class, 'exportTasks']);

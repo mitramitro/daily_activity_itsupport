@@ -1,9 +1,20 @@
 export default function BarangLogCard({ data, onDelete, onClick }) {
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
   return (
     <div onClick={() => onClick?.(data)} className="bg-white rounded-xl shadow p-4 active:scale-[0.98] transition cursor-pointer">
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <p className="text-xs text-gray-500">{data.tanggal}</p>
+        <p className="text-xs text-gray-500">{formatDate(data.tanggal)}</p>
 
         <span className={`text-xs px-2 py-1 rounded font-semibold ${data.type === "IN" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{data.type}</span>
       </div>

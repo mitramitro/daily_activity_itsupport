@@ -4,6 +4,7 @@ import { getBarangLogs, deleteBarangLog } from "../services/barangLogService";
 import BarangLogTable from "../components/BarangLogTable";
 import BarangLogCard from "../components/BarangLogCard";
 import BarangLogModal from "../components/BarangLogModal";
+import BarangLogDetailModal from "../components/BarangLogDetailModal";
 
 import BarangPage from "./BarangPage";
 import StockPage from "./StockPage";
@@ -34,6 +35,7 @@ export default function InventoryPage() {
   // MODAL
   // ======================
   const [openModal, setOpenModal] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   // ======================
   // FETCH
@@ -130,7 +132,7 @@ export default function InventoryPage() {
             {loading ? (
               <p className="text-center text-gray-500">Loading...</p>
             ) : data.length ? (
-              data.map((row) => <BarangLogCard key={row.id} data={row} onDelete={handleDelete} />)
+              data.map((row) => <BarangLogCard key={row.id} data={row} onDelete={handleDelete} onClick={() => setSelected(row)} />)
             ) : (
               <p className="text-center text-gray-500">Belum ada transaksi</p>
             )}
@@ -169,6 +171,8 @@ export default function InventoryPage() {
           <StockPage />
         </div>
       )}
+
+      <BarangLogDetailModal open={!!selected} data={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

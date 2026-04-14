@@ -16,19 +16,70 @@ class BarangLogController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->limit ?? 10;
+        // ======================
+        // PARAMS
+        // ======================
+        $search = trim($request->get('search', ''));
+        $limit  = (int) $request->get('limit', 10);
 
-        $data = BarangLog::with([
-            'barang',
-            'fromOffice',
-            'toOffice',
-            'fromEmployee',
-            'toEmployee',
-            'creator'
-        ])
-            ->latest('tanggal')
-            ->paginate($limit);
+        // 🔥 limit guard (anti abuse)
+        if ($limit <= 0) $limit = 10;
+        if ($limit > 100) $limit = 100;
 
+        // ======================
+        // QUERY
+        // ======================
+        $query = BarangLog::select(
+            'id',
+            'barang_id',
+            'type',
+            'qty',
+            'tanggal',
+            'from_employee_id',
+            'to_employee_id',
+            'from_office_id',
+            'to_office_id',
+            'created_by'
+        )
+            ->with([
+                'barang:id,name',
+                'fromOffice:id,name',
+                'toOffice:id,name',
+                'fromEmployee:id,nama',
+                'toEmployee:id,nama',
+                'creator:id,name'
+            ]);
+
+        // ======================
+        // SEARCH (SERVER SIDE)
+        // ======================
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('barang', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('fromEmployee', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('toEmployee', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', "%{$search}%");
+                    })
+                    ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        // ======================
+        // SORTING (TERBARU DI ATAS 🔥)
+        // ======================
+        $data = $query
+            ->orderByDesc('tanggal') // 🔥 terbaru di atas
+            ->orderByDesc('id')      // fallback biar stabil
+            ->paginate($limit)
+            ->appends($request->query());
+
+        // ======================
+        // RESPONSE
+        // ======================
         return response()->json($data);
     }
 
