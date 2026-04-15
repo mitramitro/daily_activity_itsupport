@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { updateTask, uploadTaskPhotos, getTaskById, deleteTaskPhoto, downloadTaskPhoto } from "../services/TaskService";
-import { getImageUrl } from "../../../services/api";
+import { getImageUrl, downloadFile } from "../../../services/api";
 
 export default function TaskDetailModal({ task, onClose, onUpdated }) {
   const [localTask, setLocalTask] = useState(task);
@@ -89,19 +89,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     try {
       const filename = photoPath.split("/").pop();
 
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(downloadTaskPhoto(filename), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal download");
-      }
-
-      const blob = await response.blob();
+      const blob = await downloadFile(downloadTaskPhoto(filename));
 
       const url = window.URL.createObjectURL(blob);
 

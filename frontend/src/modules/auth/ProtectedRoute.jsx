@@ -2,14 +2,14 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function ProtectedRoute({ children, roles = [] }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return <div className="h-screen flex items-center justify-center">Loading...</div>;
   }
 
   // belum login
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
