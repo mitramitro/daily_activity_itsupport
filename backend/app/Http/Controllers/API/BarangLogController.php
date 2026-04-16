@@ -35,6 +35,8 @@ class BarangLogController extends Controller
             'type',
             'qty',
             'tanggal',
+            'notes',
+            'condition',
             'from_employee_id',
             'to_employee_id',
             'from_office_id',

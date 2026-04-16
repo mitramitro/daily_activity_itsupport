@@ -22,9 +22,10 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
     public function collection()
     {
         $query = Task::with([
-            'employee:id,nama',
+            'employee:id,nama,nomor_pekerja,email,jabatan',
             'office:id,name',
-            'user:id,name'
+            'user:id,name,email',
+            'photos:id,task_id,photo'
         ]);
 
         // 🔒 Role-based access
@@ -32,7 +33,7 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
             $query->where('user_id', auth()->id());
         }
 
-        // 🔍 Search (multi keyword basic)
+        // 🔍 Search
         if ($this->request->filled('search')) {
             $query->where('kendala', 'like', '%' . $this->request->search . '%');
         }
@@ -47,7 +48,7 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
             $query->where('jenis_task', $this->request->jenis_task);
         }
 
-        // 📅 Date Range (core report filter)
+        // 📅 Date Range
         if ($this->request->filled('tanggal_dari') && $this->request->filled('tanggal_sampai')) {
             $query->whereBetween('tanggal', [
                 $this->request->tanggal_dari,
@@ -55,16 +56,41 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
             ]);
         }
 
-        return $query->latest()->get()->map(function ($task) {
+        return $query->latest()->get()->values()->map(function ($task, $index) {
+
+            // 🔥 Multi foto → 1 cell
+            $photos = $task->photos->map(function ($p) {
+                return asset('storage/' . $p->photo);
+            })->implode("\n");
+
             return [
-                $task->tanggal,
-                $task->kategori,
-                $task->kendala,
-                $task->solusi,
-                ucfirst(str_replace('_', ' ', $task->status)),
-                $task->employee?->nama,
-                $task->office?->name,
-                $task->user?->name, // 🔥 IT Support
+                $index + 1,
+
+                optional($task->created_at)->format('Y-m-d H:i:s'),
+
+                $task->user?->name ?? '-',
+                $task->user?->email ?? '-',
+
+                $task->employee?->nama ?? '-',
+                $task->employee?->nomor_pekerja ?? '-',
+                $task->employee?->email ?? '-',
+                $task->employee?->jabatan ?? '-',
+
+                $task->office?->name ?? '-',
+
+                $task->tanggal ?? '-',
+
+                $task->kategori ?? '-',
+
+                $task->kendala ?? '-',
+
+                $task->solusi ?? '-',
+
+                $task->status
+                    ? ucfirst(str_replace('_', ' ', $task->status))
+                    : '-',
+
+                $photos ?: '-',
             ];
         });
     }
@@ -72,38 +98,43 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
     public function headings(): array
     {
         return [
-            'Tanggal',
+            'No',
+            'Tanggal Dibuat',
+            'Nama IT Support',
+            'Email IT Support',
+            'Nama Pekerja',
+            'Nomor Pegawai',
+            'Email Pegawai',
+            'Jabatan',
+            'Office',
+            'Tanggal Kejadian',
             'Kategori',
             'Kendala',
             'Solusi',
             'Status',
-            'Pekerja',
-            'Office',
-            'IT Support',
+            'Foto',
         ];
     }
 
-
-
     public function startCell(): string
     {
-        return 'A2'; // header mulai di baris 2
+        return 'A2';
     }
 
     public function styles(Worksheet $sheet)
     {
         // 🔥 Judul
-        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A1:O1');
         $sheet->setCellValue('A1', 'REPORT TASK IT SUPPORT');
 
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
         // 🔥 Header
-        $sheet->getStyle('A2:H2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:O2')->getFont()->setBold(true);
 
-        // 🔥 Border semua cell
-        $sheet->getStyle('A2:H100')->applyFromArray([
+        // 🔥 Border
+        $sheet->getStyle('A2:O100')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => 'thin',
@@ -112,8 +143,15 @@ class TaskExport implements FromCollection, WithHeadings, WithStyles, WithCustom
         ]);
 
         // 🔥 Alignment
-        $sheet->getStyle('A2:A100')->getAlignment()->setHorizontal('center'); // tanggal
-        $sheet->getStyle('D2:E100')->getAlignment()->setHorizontal('center'); // status
+        $sheet->getStyle('A2:A100')->getAlignment()->setHorizontal('center'); // No
+        $sheet->getStyle('B2:B100')->getAlignment()->setHorizontal('center'); // Created At
+        $sheet->getStyle('J2:J100')->getAlignment()->setHorizontal('center'); // Tanggal Kejadian
+        $sheet->getStyle('N2:N100')->getAlignment()->setHorizontal('center'); // Status
+
+        // 🔥 Wrap text
+        $sheet->getStyle('L2:L100')->getAlignment()->setWrapText(true); // Kendala
+        $sheet->getStyle('M2:M100')->getAlignment()->setWrapText(true); // Solusi
+        $sheet->getStyle('O2:O100')->getAlignment()->setWrapText(true); // Foto
 
         return [];
     }

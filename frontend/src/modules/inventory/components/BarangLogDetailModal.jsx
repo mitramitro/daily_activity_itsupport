@@ -13,7 +13,7 @@ export default function BarangLogDetailModal({ open, onClose, data }) {
         <h2 className="text-lg font-semibold mb-3">Detail Transaksi</h2>
 
         <div className="text-sm space-y-2">
-          <p>
+          {/* <p>
             <b>Tanggal:</b> {data.tanggal}
           </p>
           <p>
@@ -30,7 +30,7 @@ export default function BarangLogDetailModal({ open, onClose, data }) {
           </p>
           <p>
             <b>Ke:</b> {formatEntity(data.toOffice, data.toEmployee)}
-          </p>
+          </p> */}
           <p>
             <b>Kondisi:</b> {data.condition || "-"}
           </p>

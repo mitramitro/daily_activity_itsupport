@@ -26,7 +26,6 @@ export default function BarangLogTable({ data, loading, onDelete }) {
               <th className="p-2 text-center">Qty</th>
               <th className="p-2 text-left">Dari</th>
               <th className="p-2 text-left">Ke</th>
-              <th className="p-2 text-center">Notes</th>
               <th className="p-2 text-center">Aksi</th>
             </tr>
           </thead>
@@ -52,11 +51,9 @@ export default function BarangLogTable({ data, loading, onDelete }) {
 
                 <td className="p-2 text-center">{row.qty}</td>
 
-                <td className="p-2">{formatEntity(row.fromOffice, row.fromEmployee)}</td>
+                <td className="p-2">{row.from_employee?.nama || row.from_office?.name || "-"}</td>
 
-                <td className="p-2">{formatEntity(row.toOffice, row.toEmployee)}</td>
-
-                <td className="p-2 text-center">{row.notes ? "📝" : "-"}</td>
+                <td className="p-2">{row.to_employee?.nama || row.to_office?.name || "-"}</td>
 
                 {/* 🔥 AKSI */}
                 <td
