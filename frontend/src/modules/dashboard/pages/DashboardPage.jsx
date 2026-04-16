@@ -109,7 +109,7 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-500">Belum ada aktivitas</p>
         ) : (
           recentTasks.map((task) => (
-            <div key={task.id} className="bg-white p-4 rounded-xl shadow-sm">
+            <div key={task.id} className="bg-white p-4 rounded-xl shadow-sm mb-2">
               <p className="font-medium">{task.kendala}</p>
               <p className="text-sm text-gray-500">
                 {task.user?.name || "User"} • {task.status}
