@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BarangStock;
 use Illuminate\Http\Request;
 
-class stockController extends Controller
+class StockController extends Controller
 {
     public function index(Request $request)
     {
