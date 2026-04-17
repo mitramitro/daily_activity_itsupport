@@ -5,7 +5,7 @@ export default function EmployeeTable({ employees, onRowClick }) {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      setIsMobile(window.innerWidth < 1024);
     };
 
     handleResize();
@@ -18,6 +18,7 @@ export default function EmployeeTable({ employees, onRowClick }) {
     if (status === "Pekerja") {
       return "bg-green-100 text-green-700";
     }
+
     return "bg-yellow-100 text-yellow-700";
   };
 
@@ -28,7 +29,11 @@ export default function EmployeeTable({ employees, onRowClick }) {
           <th className="px-4 py-3 text-left">Nama</th>
           <th className="px-4 py-3 text-left">Nomor</th>
           <th className="px-4 py-3 text-left">Jabatan</th>
-          <th className="px-4 py-3 text-left">Lokasi</th>
+          <th className="px-4 py-3 text-left">Fungsi</th>
+
+          {/* 🔥 UPDATED */}
+          <th className="px-4 py-3 text-left">Office</th>
+
           <th className="px-4 py-3 text-left">Status</th>
           <th className="px-4 py-3 text-right">Aksi</th>
         </tr>
@@ -43,7 +48,10 @@ export default function EmployeeTable({ employees, onRowClick }) {
 
             <td className="px-4 py-3 text-gray-600">{emp.jabatan}</td>
 
-            <td className="px-4 py-3 text-gray-600">{emp.lokasi}</td>
+            <td className="px-4 py-3 text-gray-600">{emp.fungsi}</td>
+
+            {/* 🔥 UPDATED */}
+            <td className="px-4 py-3 text-gray-600">{emp.office?.name || "-"}</td>
 
             <td className="px-4 py-3">
               <span
@@ -57,10 +65,11 @@ export default function EmployeeTable({ employees, onRowClick }) {
                 {emp.status}
               </span>
             </td>
+
             <td className="px-4 py-3 text-right">
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // penting!
+                  e.stopPropagation();
                   onRowClick && onRowClick(emp);
                 }}
                 className="text-gray-500 hover:text-black"

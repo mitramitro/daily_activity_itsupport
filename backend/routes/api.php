@@ -2,16 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\api\DashboardController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskPhotoController;
 use App\Http\Controllers\Api\OfficeController;
 use App\Http\Controllers\Api\ReportsController;
-use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BarangController;
 use App\Http\Controllers\Api\BarangLogController;
-use App\Http\Controllers\api\stockController;
+use App\Http\Controllers\Api\StockController;
 
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('register');
@@ -55,7 +55,7 @@ Route::middleware('jwt')->group(function () {
         Route::delete('{id}', [BarangLogController::class, 'destroy']);
     });
 
-    Route::get('/stocks', [stockController::class, 'index']);
+    Route::get('/stocks', [StockController::class, 'index']);
 
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import BarangLogDetailModal from "./BarangLogDetailModal";
 
-const formatEntity = (office, employee) => {
-  if (employee) return `${employee.nama} (${employee.lokasi})`;
-  if (office) return office.name;
-  return "-";
-};
+// const formatEntity = (office, employee) => {
+//   if (employee) return `${employee.nama} (${employee.lokasi})`;
+//   if (office) return office.name;
+//   return "-";
+// };
 
 export default function BarangLogTable({ data, loading, onDelete }) {
   const [selected, setSelected] = useState(null);

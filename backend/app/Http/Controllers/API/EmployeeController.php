@@ -17,7 +17,7 @@ class EmployeeController extends Controller
         $limit  = $request->limit ?? 10;
 
         $employees = Employee::query()
-
+            ->with('office:id,name')
             ->select(
                 'id',
                 'nama',
@@ -26,7 +26,8 @@ class EmployeeController extends Controller
                 'email',
                 'jabatan',
                 'status',
-                'lokasi'
+                'office_id',
+                'fungsi',
             )
 
             ->when($search, function ($q) use ($search) {
@@ -53,9 +54,11 @@ class EmployeeController extends Controller
             'nomor_pekerja' => 'required|string|unique:employees',
             'jabatan' => 'required|string',
             'status' => 'required|in:Pekerja,Mitra Kerja',
-            'lokasi' => 'required|string',
+            'office_id' => 'required|exists:offices,id',
             'email' => 'nullable|email',
-            'no_hp' => 'nullable|string'
+            'no_hp' => 'nullable|string',
+            'fungsi' => 'nullable|string',
+
         ]);
 
         $employee = Employee::create([
@@ -65,8 +68,8 @@ class EmployeeController extends Controller
             'email' => $request->email,
             'jabatan' => $request->jabatan,
             'status' => $request->status,
-            'lokasi' => $request->lokasi,
-            'keterangan' => $request->keterangan
+            'office_id' => $request->office_id,
+            'fungsi' => $request->fungsi
         ]);
 
         return response()->json([
@@ -81,7 +84,8 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        $employee = Employee::findOrFail($id);
+        $employee = Employee::with('office:id,name') // 🔥 UPDATED
+            ->findOrFail($id);
 
         return response()->json([
             'data' => $employee
@@ -101,9 +105,10 @@ class EmployeeController extends Controller
             'nomor_pekerja' => 'required|string|unique:employees,nomor_pekerja,' . $id,
             'jabatan' => 'required|string',
             'status' => 'required|in:Pekerja,Mitra Kerja',
-            'lokasi' => 'required|string',
+            'office_id' => 'required|exists:offices,id',
             'email' => 'nullable|email',
-            'no_hp' => 'nullable|string'
+            'no_hp' => 'nullable|string',
+            'fungsi' => 'nullable|string',
         ]);
 
         $employee->update([
@@ -113,8 +118,8 @@ class EmployeeController extends Controller
             'email' => $request->email,
             'jabatan' => $request->jabatan,
             'status' => $request->status,
-            'lokasi' => $request->lokasi,
-            'keterangan' => $request->keterangan
+            'office_id' => $request->office_id,
+            'fungsi' => $request->fungsi
         ]);
 
         return response()->json([

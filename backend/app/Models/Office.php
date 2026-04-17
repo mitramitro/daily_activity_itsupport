@@ -13,4 +13,9 @@ class Office extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

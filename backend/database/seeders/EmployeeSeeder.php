@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Employee;
+use App\Models\Office; // 🔥 UPDATED
 
 class EmployeeSeeder extends Seeder
 {
@@ -15,27 +16,10 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
+        // 🔥 UPDATED: ambil ID berdasarkan nama office
+        $officeIds = Office::pluck('id', 'name');
+
         $employees = [
-            [
-                'nama' => 'Budi Santoso',
-                'nomor_pekerja' => 'EMP001',
-                'no_hp' => '0811111111',
-                'email' => 'budi@mail.com',
-                'jabatan' => 'Operator',
-                'status' => 'Pekerja',
-                'lokasi' => 'FT Cikampek',
-                'keterangan' => 'User printer'
-            ],
-            [
-                'nama' => 'Andi Wijaya',
-                'nomor_pekerja' => 'EMP002',
-                'no_hp' => '0812222222',
-                'email' => 'andi@mail.com',
-                'jabatan' => 'Supervisor',
-                'status' => 'Pekerja',
-                'lokasi' => 'FT Padalarang',
-                'keterangan' => null
-            ],
             [
                 'nama' => 'Siti Aminah',
                 'nomor_pekerja' => 'EMP003',
@@ -43,19 +27,10 @@ class EmployeeSeeder extends Seeder
                 'email' => 'siti@mail.com',
                 'jabatan' => 'Admin',
                 'status' => 'Mitra Kerja',
-                'lokasi' => 'Integrated Terminal Balongan - Fuel',
-                'keterangan' => null
+                'fungsi' => 'Administrasi',
+                'office_id' => $officeIds['FT Balongan'] ?? null,
             ],
-            [
-                'nama' => 'Rudi Hartono',
-                'nomor_pekerja' => 'EMP004',
-                'no_hp' => '0814444444',
-                'email' => 'rudi@mail.com',
-                'jabatan' => 'Operator',
-                'status' => 'Pekerja',
-                'lokasi' => 'FT Cikampek',
-                'keterangan' => null
-            ],
+
             [
                 'nama' => 'Dewi Lestari',
                 'nomor_pekerja' => 'EMP005',
@@ -63,49 +38,11 @@ class EmployeeSeeder extends Seeder
                 'email' => 'dewi@mail.com',
                 'jabatan' => 'Finance',
                 'status' => 'Pekerja',
-                'lokasi' => 'FT Padalarang',
-                'keterangan' => null
+                'fungsi' => 'Keuangan',
+                'office_id' => $officeIds['LPG Balongan'] ?? null,
             ],
-            [
-                'nama' => 'Ahmad Fauzi',
-                'nomor_pekerja' => 'EMP006',
-                'no_hp' => '0816666666',
-                'email' => 'ahmad@mail.com',
-                'jabatan' => 'Operator',
-                'status' => 'Mitra Kerja',
-                'lokasi' => 'Integrated Terminal Balongan - Fuel',
-                'keterangan' => null
-            ],
-            [
-                'nama' => 'Rina Kurnia',
-                'nomor_pekerja' => 'EMP007',
-                'no_hp' => '0817777777',
-                'email' => 'rina@mail.com',
-                'jabatan' => 'HR',
-                'status' => 'Pekerja',
-                'lokasi' => 'FT Cikampek',
-                'keterangan' => null
-            ],
-            [
-                'nama' => 'Yoga Pratama',
-                'nomor_pekerja' => 'EMP008',
-                'no_hp' => '0818888888',
-                'email' => 'yoga@mail.com',
-                'jabatan' => 'Technician',
-                'status' => 'Pekerja',
-                'lokasi' => 'FT Padalarang',
-                'keterangan' => null
-            ],
-            [
-                'nama' => 'Lina Marlina',
-                'nomor_pekerja' => 'EMP009',
-                'no_hp' => '0819999999',
-                'email' => 'lina@mail.com',
-                'jabatan' => 'Admin',
-                'status' => 'Mitra Kerja',
-                'lokasi' => 'Integrated Terminal Balongan - Fuel',
-                'keterangan' => null
-            ],
+
+
             [
                 'nama' => 'Fajar Nugroho',
                 'nomor_pekerja' => 'EMP010',
@@ -113,9 +50,9 @@ class EmployeeSeeder extends Seeder
                 'email' => 'fajar@mail.com',
                 'jabatan' => 'Operator',
                 'status' => 'Pekerja',
-                'lokasi' => 'FT Cikampek',
-                'keterangan' => null
-            ]
+                'fungsi' => 'Operasional',
+                'office_id' => $officeIds['FT Cikampek'] ?? null,
+            ],
         ];
 
         foreach ($employees as $employee) {

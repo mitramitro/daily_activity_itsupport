@@ -2,8 +2,13 @@ export default function BarangLogDetailModal({ open, onClose, data }) {
   if (!open || !data) return null;
 
   const formatEntity = (office, employee) => {
-    if (employee) return `${employee.nama} (${employee.lokasi})`;
+    // 🔥 UPDATED: lokas -> office.name
+    if (employee) {
+      return `${employee.nama} (${employee.office?.name || "-"})`;
+    }
+
     if (office) return office.name;
+
     return "-";
   };
 

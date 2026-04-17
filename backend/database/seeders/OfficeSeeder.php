@@ -15,14 +15,14 @@ class OfficeSeeder extends Seeder
             'FT Tasikmalaya',
             'FT Tj Gerem',
             'FT Ujung Berung',
-            'IT Balongan - FT Balongan',
-            'IT Balongan - LPG Balongan',
-            'IT Jakarta - FT Plumpang',
-            'IT Jakarta - FT Priok',
-            'IT Jakarta - LPG Priok',
-            'Kantor Cabang Bandung',
+            'FT Balongan',
+            'LPG Balongan',
+            'FT Plumpang',
+            'FT Priok',
+            'LPG Priok',
+            'Cabang Bandung',
             'SHAFTI',
-            'Kantor Region JBB',
+            'Region JBB',
         ];
 
         foreach ($offices as $office) {

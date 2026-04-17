@@ -20,7 +20,7 @@ return new class extends Migration
                 ->constrained('offices')
                 ->cascadeOnDelete();
 
-            // Stock per lokasi
+            // Stock per lokasnya
             $table->integer('stock')->default(0);
 
             $table->timestamps();

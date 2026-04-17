@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
+            OfficeSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,
-            OfficeSeeder::class,
         ]);
     }
 }

@@ -17,3 +17,8 @@ export const updateEmployee = (id, data) => {
 export const deleteEmployee = (id) => {
   return api.delete(`/employees/${id}`);
 };
+
+// 🔹 ambil office
+export const getOffices = () => {
+  return api.get("/offices");
+};

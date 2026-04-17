@@ -13,7 +13,11 @@ class Employee extends Model
         'email',
         'jabatan',
         'status',
-        'lokasi',
-        'keterangan'
+        'office_id',
     ];
+
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
+    }
 }

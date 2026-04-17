@@ -4,7 +4,7 @@ import { createTaskWithPhoto, updateTask, getEmployees, getOffices } from "../se
 import { getImageUrl } from "../../../services/api";
 import toast from "react-hot-toast";
 
-export default function TaskForm({ onSuccess, initialData }) {
+export default function TaskForm({ onSuccess, initialData, currentUser }) {
   const [loading, setLoading] = useState(false);
 
   const [employees, setEmployees] = useState([]);
@@ -12,11 +12,30 @@ export default function TaskForm({ onSuccess, initialData }) {
 
   const isEditMode = !!initialData;
 
+  //untuk default office berdasarkan user yang login (hanya saat create, kalau edit tidak diubah)
+  useEffect(() => {
+    if (!isEditMode && currentUser?.office_id && offices.length) {
+      setForm((prev) => {
+        if (prev.office_id) return prev;
+
+        return {
+          ...prev,
+          office_id: Number(currentUser.office_id),
+        };
+      });
+    }
+  }, [currentUser, offices, isEditMode]);
+
   const kategoriOptions = [
     { value: "PC", label: "PC" },
     { value: "Laptop", label: "Laptop" },
     { value: "Network", label: "Network" },
     { value: "Aplikasi", label: "Aplikasi" },
+    { value: "Printer", label: "Printer" },
+    { value: "HT", label: "HT" },
+    { value: "Sound System", label: "Sound System" },
+    { value: "Telepon", label: "Telepon" },
+    { value: "Email", label: "Email" },
     { value: "Lainnya", label: "Lainnya" },
   ];
 
@@ -88,7 +107,7 @@ export default function TaskForm({ onSuccess, initialData }) {
   // 🔹 options mapping
   const employeeOptions = employees.map((e) => ({
     value: e.id,
-    label: e.nama,
+    label: `${e.nama} - ${e.nomor_pekerja} - ${e.fungsi}`,
   }));
 
   const officeOptions = offices.map((o) => ({
@@ -126,6 +145,9 @@ export default function TaskForm({ onSuccess, initialData }) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
     setPreview((prev) => prev.filter((_, i) => i !== index));
   };
+  console.log("USER:", currentUser);
+  console.log("FORM office_id:", form.office_id);
+  console.log("OPTIONS:", officeOptions);
 
   // 🔥 submit
   const handleSubmit = async (e) => {
@@ -176,10 +198,18 @@ export default function TaskForm({ onSuccess, initialData }) {
         </div>
 
         {/* OFFICE */}
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Office</label>
-          <Select options={officeOptions} value={officeOptions.find((opt) => opt.value === form.office_id)} onChange={(selected) => setForm({ ...form, office_id: selected?.value })} isDisabled={isEditMode} styles={customSelectStyle} />
-        </div>
+        <Select
+          options={officeOptions}
+          value={officeOptions.find((opt) => opt.value === form.office_id) || null}
+          onChange={(selected) =>
+            setForm((prev) => ({
+              ...prev,
+              office_id: selected?.value || "",
+            }))
+          }
+          isDisabled={isEditMode}
+          styles={customSelectStyle}
+        />
 
         {/* ROW */}
         <div className="grid grid-cols-2 gap-3">

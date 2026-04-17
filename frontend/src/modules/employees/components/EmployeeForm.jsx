@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
+import Select from "react-select";
+import { getOffices } from "../services/employeeService";
 
 export default function EmployeeForm({ onSubmit, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
+  const [offices, setOffices] = useState([]);
 
   const [form, setForm] = useState({
     nama: "",
@@ -10,21 +13,47 @@ export default function EmployeeForm({ onSubmit, onCancel, initialData }) {
     email: "",
     jabatan: "",
     status: "Pekerja",
-    lokasi: "",
+    fungsi: "",
+    office_id: "",
     keterangan: "",
   });
 
-  const lokasiOptions = ["Integrated Terminal Balongan - Fuel", "FT Padalarang", "FT Cikampek"];
+  // 🔥 Fetch offices
+  useEffect(() => {
+    const fetchOffices = async () => {
+      try {
+        const res = await getOffices();
+        setOffices(res.data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
+    fetchOffices();
+  }, []);
+
+  // 🔥 Handle edit mode
+  useEffect(() => {
+    if (initialData) {
+      setForm((prev) => ({
+        ...prev,
+        ...initialData,
+        office_id: initialData.office?.id || initialData.office_id || "",
+      }));
+    }
+  }, [initialData]);
+
+  // 🔹 input change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
+  // 🔹 submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -36,13 +65,25 @@ export default function EmployeeForm({ onSubmit, onCancel, initialData }) {
     }
   };
 
-  const inputClass = "w-full bg-gray-50 rounded-xl px-3 py-2 text-sm outline-none transition focus:bg-white focus:ring-2 focus:ring-blue-500";
+  // 🔹 options
+  const officeOptions = offices.map((o) => ({
+    value: o.id,
+    label: o.name,
+  }));
 
-  useEffect(() => {
-    if (initialData) {
-      setForm(initialData);
-    }
-  }, [initialData]);
+  // 🔹 style select (biar konsisten)
+  const customSelectStyle = {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: "#f9fafb",
+      border: "none",
+      boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+      borderRadius: "12px",
+      minHeight: "42px",
+    }),
+  };
+
+  const inputClass = "w-full bg-gray-50 rounded-xl px-3 py-2 text-sm outline-none transition focus:bg-white focus:ring-2 focus:ring-blue-500";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -70,18 +111,26 @@ export default function EmployeeForm({ onSubmit, onCancel, initialData }) {
         </select>
       </div>
 
-      {/* Lokasi */}
-      <select name="lokasi" value={form.lokasi} onChange={handleChange} className={inputClass} required>
-        <option value="">Pilih Lokasi</option>
-        {lokasiOptions.map((lokasi) => (
-          <option key={lokasi} value={lokasi}>
-            {lokasi}
-          </option>
-        ))}
-      </select>
+      {/* Fungsi */}
+      <input type="text" name="fungsi" placeholder="Fungsi" value={form.fungsi} onChange={handleChange} className={inputClass} required />
 
-      {/* Keterangan */}
-      <textarea name="keterangan" placeholder="Keterangan" value={form.keterangan} onChange={handleChange} className={inputClass} rows="3" />
+      {/* 🔥 Office pakai react-select */}
+      <div>
+        <label className="text-xs text-gray-500 mb-1 block">Office</label>
+
+        <Select
+          options={officeOptions}
+          value={officeOptions.find((opt) => opt.value === form.office_id) || null}
+          onChange={(selected) =>
+            setForm((prev) => ({
+              ...prev,
+              office_id: selected?.value || "",
+            }))
+          }
+          styles={customSelectStyle}
+          placeholder="Pilih Office..."
+        />
+      </div>
 
       {/* Button */}
       <div className="flex justify-end gap-3 pt-2">

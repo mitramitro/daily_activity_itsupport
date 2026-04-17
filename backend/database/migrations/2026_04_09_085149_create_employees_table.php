@@ -24,16 +24,19 @@ return new class extends Migration
             $table->enum('status', ['Pekerja', 'Mitra Kerja'])
                 ->default('Pekerja');
 
-            $table->string('lokasi');
-
-            $table->text('keterangan')->nullable();
+            $table->unsignedBigInteger('office_id')->nullable();
 
             $table->timestamps();
+
+            $table->foreign('office_id')
+                ->references('id')
+                ->on('offices')
+                ->nullOnDelete();
 
             // index untuk search cepat
             $table->index('nama');
             $table->index('nomor_pekerja');
-            $table->index('lokasi');
+            $table->index('office_id');
         });
     }
 

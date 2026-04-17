@@ -47,8 +47,14 @@ class BarangLogController extends Controller
                 'barang:id,name',
                 'fromOffice:id,name',
                 'toOffice:id,name',
-                'fromEmployee:id,nama',
-                'toEmployee:id,nama',
+
+                // 🔥 UPDATED
+                'fromEmployee:id,nama,office_id',
+                'fromEmployee.office:id,name',
+
+                'toEmployee:id,nama,office_id',
+                'toEmployee.office:id,name',
+
                 'creator:id,name'
             ]);
 
