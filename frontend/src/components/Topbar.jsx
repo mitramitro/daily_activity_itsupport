@@ -56,7 +56,7 @@ export default function Topbar({ collapsed, setCollapsed }) {
           <Menu size={20} />
         </button>
 
-        <h1 className="font-semibold">ITApp</h1>
+        <h1 className="font-semibold">ITDesk</h1>
       </div>
 
       {/* RIGHT */}
