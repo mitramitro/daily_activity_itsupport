@@ -6,8 +6,8 @@ export default function AuthLayout() {
       <div className="w-full max-w-md">
         {/* Logo / App Title */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold">ITApp</h1>
-          <p className="text-gray-500 text-sm">IT Support Management System</p>
+          <h1 className="text-2xl font-bold">ITDesk</h1>
+          <p className="text-gray-500 text-sm">Daily IT RJBB</p>
         </div>
 
         {/* Page Content (Login / Register) */}
