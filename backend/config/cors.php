@@ -16,6 +16,7 @@ return [
     'allowed_origins' => [
         'https://itdesk.digisib.net',
         'http://localhost:3000', // Untuk testing lokal (sesuaikan portnya)
+        'https://localhost', // Untuk testing lokal dengan HTTPS (jika pakai sertifikat self-signed)
     ],
 
     'allowed_origins_patterns' => [],
