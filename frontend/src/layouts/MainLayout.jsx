@@ -8,7 +8,8 @@ export default function MainLayout() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    // <div className="min-h-screen bg-slate-50">
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
       {/* Sidebar (desktop only) */}
       <div className="hidden lg:block fixed top-0 left-0 h-full z-40">
         <Sidebar collapsed={collapsed} />
@@ -18,12 +19,20 @@ export default function MainLayout() {
       <Topbar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       {/* Content */}
-      <div
+      {/* <div
         className={`
           pt-16 pb-20
           transition-all duration-300
           ${collapsed ? "lg:ml-20" : "lg:ml-64"}
         `}
+      > */}
+      <div
+        className={`
+    flex-1 overflow-auto
+    pt-16 pb-20
+    transition-all duration-300
+    ${collapsed ? "lg:ml-20" : "lg:ml-64"}
+  `}
       >
         <main className="px-3 sm:px-4 lg:px-6">
           <Outlet />
@@ -31,7 +40,8 @@ export default function MainLayout() {
       </div>
 
       {/* Bottom Navigation (mobile only) */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full z-50">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white">
+        {/* <div className="lg:hidden fixed bottom-0 left-0 w-full z-50"> */}
         <BottomNav />
       </div>
     </div>

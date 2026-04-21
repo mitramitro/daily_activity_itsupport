@@ -11,4 +11,9 @@ body,
 #root {
   background-color: var(--color-bg-light);
   height: 100%;
+  overflow: hidden;
+}
+/* Saat keyboard muncul */
+.keyboard-open .bottom-nav {
+  display: none;
 }
