@@ -4,7 +4,14 @@
   "webDir": "dist",
   "plugins": {
     "Keyboard": {
-      "resize": "none"
+      "resize": "body",
+      "resizeOnFullScreen": false
+    },
+    "StatusBar": {
+      "overlaysWebView": true
+    },
+    "SystemBars": {
+      "insetsHandling": "disable"
     }
   }
 }

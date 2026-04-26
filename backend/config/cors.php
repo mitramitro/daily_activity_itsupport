@@ -17,6 +17,7 @@ return [
         'https://itdesk.digisib.net',
         'http://localhost:3000', // Untuk testing lokal (sesuaikan portnya)
         'https://localhost', // Untuk testing lokal dengan HTTPS (jika pakai sertifikat self-signed)
+        'http://localhost:5173' // Untuk testing lokal dengan Vite (sesuaikan portnya)
     ],
 
     'allowed_origins_patterns' => [],

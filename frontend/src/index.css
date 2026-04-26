@@ -1,19 +1,181 @@
 @import "tailwindcss";
 
+/* ============================================
+   SAFE AREA VARIABLES (Capacitor 8 Best Practice)
+   ============================================ */
+:root {
+  /* Safe area insets - fallback ke 0px jika tidak tersedia */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Status bar height (alias dari safe-area-top) */
+  --status-bar-height: env(safe-area-inset-top, 0px);
+
+  /* Navbar height untuk padding calculation */
+  --topbar-height: 64px;
+  --bottom-nav-height: 65px;
+}
+
+/* Dark mode support (opsional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-light: #0f172a;
+  }
+}
+
 @theme {
-  --color-primary: #0061ff; /* Biru Profesional */
+  --color-primary: #0061ff;
   --color-primary-dark: #004ecc;
   --color-bg-light: #f0f7ff;
+}
+
+/* ============================================
+   RESET & ROOT STYLES
+   ============================================ */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body,
 #root {
+  min-height: 100%;
   background-color: var(--color-bg-light);
-  height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
-/* Saat keyboard muncul */
+
+/* SMOOTH SCROLL */
+body {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Prevent layout shift on keyboard open */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   INPUT FIX (prevent zoom on focus)
+   ============================================ */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* Disable auto zoom on select/input in iOS/Android webview */
+select:focus,
+input:focus,
+textarea:focus {
+  font-size: 16px;
+}
+
+/* ============================================
+   KEYBOARD HANDLING
+   ============================================ */
 .keyboard-open .bottom-nav {
   display: none;
+}
+
+/* Smooth transition for keyboard */
+body.keyboard-open {
+  position: absolute;
+  height: auto;
+  min-height: 100%;
+}
+
+/* ============================================
+   SAFE AREA UTILITY CLASSES (Best Practice)
+   ============================================ */
+/* Top safe area */
+.safe-top {
+  padding-top: var(--safe-area-top);
+}
+
+/* Bottom safe area */
+.safe-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* Left safe area (untuk landscape atau tablet) */
+.safe-left {
+  padding-left: var(--safe-area-left);
+}
+
+/* Right safe area */
+.safe-right {
+  padding-right: var(--safe-area-right);
+}
+
+/* All safe areas */
+.safe-all {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* ============================================
+   FIXED ELEMENTS WITH SAFE AREA
+   ============================================ */
+/* Untuk fixed element di top */
+.fixed-top-safe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: var(--safe-area-top);
+  z-index: 50;
+}
+
+/* Untuk fixed element di bottom */
+.fixed-bottom-safe {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: var(--safe-area-bottom);
+  z-index: 50;
+}
+
+/* ============================================
+   CONTENT AREA WITH SAFE AREA
+   ============================================ */
+/* Content wrapper dengan spacing untuk fixed topbar & bottom nav */
+.content-with-safe-area {
+  padding-top: calc(var(--topbar-height) + var(--safe-area-top));
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+}
+
+/* Untuk halaman tanpa bottom nav */
+.content-with-topbar-only {
+  padding-top: calc(var(--topbar-height) + var(--safe-area-top));
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* ============================================
+   UTILITY
+   ============================================ */
+/* Hide scrollbar tapi tetap bisa scroll (pilihan) */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent pull-to-refresh di webview (opsional) */
+.no-pull-to-refresh {
+  overscroll-behavior-y: contain;
 }
