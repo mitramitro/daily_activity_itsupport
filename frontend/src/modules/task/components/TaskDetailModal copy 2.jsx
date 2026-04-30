@@ -3,7 +3,6 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
 import { updateTask, uploadTaskPhotos, getTaskById, deleteTaskPhoto, downloadTaskPhoto } from "../services/TaskService";
 import { getImageUrl, downloadFile } from "../../../services/api";
-import { handleDownloadPhoto } from "../../../utils/download";
 import toast from "react-hot-toast";
 
 export default function TaskDetailModal({ task, onClose, onUpdated }) {
@@ -195,7 +194,27 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
   // ============================================
   // 🔥 DOWNLOAD FOTO (via browser)
   // ============================================
-  // sudah ada di utils/download.js sebagai handleDownloadPhoto, yang otomatis mendeteksi platform dan menggunakan cara terbaik untuk download (link download untuk web, Filesystem API untuk mobile)
+  const handleDownloadPhoto = async (photoPath, filename = null) => {
+    try {
+      const finalFilename = filename || photoPath.split("/").pop() || `foto_${Date.now()}.jpg`;
+
+      const blob = await downloadFile(downloadTaskPhoto(finalFilename));
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = finalFilename;
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Download dimulai");
+    } catch (err) {
+      console.error(err);
+      toast.error("Gagal download foto");
+    }
+  };
 
   // ============================================
   // 🔥 PREVIEW FOTO (Modal Fullscreen)
@@ -231,8 +250,6 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
   // Download dari modal preview
   const handleDownloadFromPreview = async () => {
     const currentPhoto = localTask.photos[currentPreviewIndex];
-    console.log("Download:", currentPhoto); // debug objek
-    console.log("Path:", currentPhoto?.photo); // debug path
     if (currentPhoto) {
       await handleDownloadPhoto(currentPhoto.photo);
     }
@@ -375,9 +392,8 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
               {photoUrls.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {localTask.photos.map((p, idx) => {
-                    console.log("Raw photo path:", p.photo);
                     const url = getImageUrl(p.photo);
-                    console.log("Generated URL:", url);
+
                     return (
                       <div key={p.id} className="relative group">
                         {/* THUMBNAIL - klik untuk preview */}
