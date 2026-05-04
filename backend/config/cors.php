@@ -1,37 +1,24 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | CORS Configuration - JWT Optimized
-    |--------------------------------------------------------------------------
-    */
-
     'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*'],
 
     'allowed_methods' => ['*'],
 
-    // Daftarkan domain Front-end kamu
     'allowed_origins' => [
         'https://itdesk.digisib.net',
-        'http://localhost:3000', // Untuk testing lokal (sesuaikan portnya)
-        'https://localhost', // Untuk testing lokal dengan HTTPS (jika pakai sertifikat self-signed)
-        'http://localhost:5173' // Untuk testing lokal dengan Vite (sesuaikan portnya)
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174', // ← ini yang kurang
     ],
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
-    // PENTING UNTUK JWT: 
-    // Jika API kamu mengirimkan token di header (misal: Authorization), 
-    // tambahkan di sini agar bisa dibaca oleh JavaScript di Front-end.
     'exposed_headers' => ['Authorization'],
 
     'max_age' => 0,
 
-    // Set TRUE karena JWT sering dikirim via Authorization Header atau Cookie
     'supports_credentials' => true,
-
 ];

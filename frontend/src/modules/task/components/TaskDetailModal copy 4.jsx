@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
 import { updateTask, uploadTaskPhotos, getTaskById, deleteTaskPhoto, getImageUrl } from "../services/TaskService";
@@ -13,10 +13,12 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
+  // State untuk modal preview
   const [previewImage, setPreviewImage] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
 
+  // Cek platform
   const isNative = Capacitor.isNativePlatform();
   const isMobileWeb = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const showMobileCameraOptions = isNative || isMobileWeb;
@@ -38,13 +40,15 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     });
   };
 
-  // ✅ SIMPAN PERUBAHAN
+  // ✅ SIMPAN PERUBAHAN (Status, Kendala, Solusi)
   const handleSave = async () => {
     setLoading(true);
     try {
       await updateTask(localTask.id, { status, kendala, solusi });
+
       const res = await getTaskById(localTask.id);
       setLocalTask(res.data.data);
+
       onUpdated?.();
       toast.success("Task berhasil diupdate");
     } catch (err) {
@@ -55,7 +59,9 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ UPLOAD FOTO (Web - File Input)
+  // ============================================
+  // 🔥 UPLOAD FOTO LANGSUNG (Via File Input - Web)
+  // ============================================
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -66,10 +72,14 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     try {
       setUploading(true);
       await uploadTaskPhotos(localTask.id, formData);
+
       const res = await getTaskById(localTask.id);
       setLocalTask(res.data.data);
+
       onUpdated?.();
       toast.success(`${files.length} foto berhasil diupload`);
+
+      // Reset input file
       e.target.value = "";
     } catch (err) {
       console.error(err);
@@ -79,7 +89,9 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ AMBIL FOTO DARI CAMERA (Capacitor)
+  // ============================================
+  // 🔥 AMBIL & UPLOAD FOTO DARI CAMERA (Capacitor)
+  // ============================================
   const takePhotoAndUpload = async () => {
     try {
       const image = await Camera.getPhoto({
@@ -91,16 +103,20 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
 
       setUploading(true);
 
+      // Convert dataUrl ke File
       const response = await fetch(image.dataUrl);
       const blob = await response.blob();
       const file = new File([blob], `photo_${Date.now()}.jpeg`, { type: "image/jpeg" });
 
+      // Upload langsung
       const formData = new FormData();
       formData.append("photos[]", file);
 
       await uploadTaskPhotos(localTask.id, formData);
+
       const res = await getTaskById(localTask.id);
       setLocalTask(res.data.data);
+
       onUpdated?.();
       toast.success("Foto berhasil diupload");
     } catch (err) {
@@ -113,7 +129,9 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ AMBIL FOTO DARI GALLERY (Capacitor)
+  // ============================================
+  // 🔥 AMBIL & UPLOAD FOTO DARI GALLERY (Capacitor)
+  // ============================================
   const pickFromGalleryAndUpload = async () => {
     try {
       const image = await Camera.getPhoto({
@@ -125,16 +143,20 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
 
       setUploading(true);
 
+      // Convert dataUrl ke File
       const response = await fetch(image.dataUrl);
       const blob = await response.blob();
       const file = new File([blob], `gallery_${Date.now()}.jpeg`, { type: "image/jpeg" });
 
+      // Upload langsung
       const formData = new FormData();
       formData.append("photos[]", file);
 
       await uploadTaskPhotos(localTask.id, formData);
+
       const res = await getTaskById(localTask.id);
       setLocalTask(res.data.data);
+
       onUpdated?.();
       toast.success("Foto berhasil diupload");
     } catch (err) {
@@ -147,16 +169,20 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ HAPUS FOTO
+  // ============================================
+  // 🔥 HAPUS FOTO
+  // ============================================
   const handleDeletePhoto = async (photoId) => {
     if (!confirm("Hapus foto ini?")) return;
 
     try {
       await deleteTaskPhoto(photoId);
+
       setLocalTask((prev) => ({
         ...prev,
         photos: prev.photos.filter((p) => p.id !== photoId),
       }));
+
       onUpdated?.();
       toast.success("Foto berhasil dihapus");
     } catch (err) {
@@ -165,7 +191,14 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ PREVIEW
+  // ============================================
+  // 🔥 DOWNLOAD FOTO (via browser)
+  // ============================================
+  // sudah ada di utils/download.js sebagai handleDownloadPhoto, yang otomatis mendeteksi platform dan menggunakan cara terbaik untuk download (link download untuk web, Filesystem API untuk mobile)
+
+  // ============================================
+  // 🔥 PREVIEW FOTO (Modal Fullscreen)
+  // ============================================
   const openPreview = (images, index) => {
     setPreviewImages(images);
     setCurrentPreviewIndex(index);
@@ -194,9 +227,11 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
     }
   };
 
-  // ✅ DOWNLOAD DARI PREVIEW - pakai path relatif, bukan URL
+  // Download dari modal preview
   const handleDownloadFromPreview = async () => {
     const currentPhoto = localTask.photos[currentPreviewIndex];
+    console.log("Download:", currentPhoto); // debug objek
+    console.log("Path:", currentPhoto?.photo); // debug path
     if (currentPhoto) {
       await handleDownloadPhoto(currentPhoto.photo);
     }
@@ -204,14 +239,17 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
 
   if (!localTask) return null;
 
+  // Siapkan array URL foto untuk preview
   const photoUrls = localTask.photos?.map((p) => getImageUrl(p.photo)) || [];
 
   return (
     <>
       {/* MODAL UTAMA */}
       <div className="fixed inset-0 z-50 flex md:items-center items-end justify-center">
+        {/* backdrop */}
         <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
+        {/* modal */}
         <div className="relative bg-white w-full md:max-w-2xl rounded-t-2xl md:rounded-2xl flex flex-col max-h-[90vh]">
           {/* HEADER */}
           <div className="flex justify-between items-start p-4 md:p-6 border-b">
@@ -221,6 +259,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                 {localTask.employee?.nama} • {localTask.office?.name}
               </p>
             </div>
+
             <button onClick={onClose} className="text-gray-400 text-lg hover:text-gray-600">
               ✕
             </button>
@@ -233,10 +272,12 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                 <p className="text-gray-500">Kategori</p>
                 <p className="font-medium">{localTask.kategori}</p>
               </div>
+
               <div>
                 <p className="text-gray-500">Jenis</p>
                 <p className="font-medium capitalize">{localTask.jenis_task}</p>
               </div>
+
               <div>
                 <p className="text-gray-500">Tanggal</p>
                 <p className="font-medium">{formatDate(localTask.tanggal)}</p>
@@ -253,25 +294,32 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                   <option value="resolved">Resolved</option>
                 </select>
               </div>
+
               <div>
                 <label className="text-xs text-gray-500">Kendala</label>
                 <textarea value={kendala} onChange={(e) => setKendala(e.target.value)} rows="3" className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
+
               <div>
                 <label className="text-xs text-gray-500">Solusi</label>
                 <textarea value={solusi} onChange={(e) => setSolusi(e.target.value)} rows="2" className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
+
               <button onClick={handleSave} disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50">
                 {loading ? "Menyimpan..." : "Simpan Perubahan"}
               </button>
             </div>
 
-            {/* FOTO SECTION */}
+            {/* ============================================ */}
+            {/* 🔥 FOTO SECTION */}
+            {/* ============================================ */}
             <div className="mb-5">
               <h3 className="text-sm font-semibold mb-3">Foto</h3>
 
+              {/* UPLOAD BUTTONS - MOBILE VS WEB */}
               <div className="space-y-3 mb-4">
                 {showMobileCameraOptions ? (
+                  // MOBILE: Tombol Camera & Gallery
                   <div className="flex gap-2">
                     <button type="button" onClick={takePhotoAndUpload} disabled={uploading} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition disabled:opacity-50">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -285,6 +333,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                       </svg>
                       Camera
                     </button>
+
                     <button type="button" onClick={pickFromGalleryAndUpload} disabled={uploading} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition disabled:opacity-50">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path
@@ -298,6 +347,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                     </button>
                   </div>
                 ) : (
+                  // WEB: File Input
                   <div>
                     <label className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition cursor-pointer w-fit">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -312,8 +362,8 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                 {uploading && (
                   <div className="flex items-center gap-2 text-blue-600 text-sm">
                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Mengupload...
                   </div>
@@ -324,10 +374,15 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
               {photoUrls.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {localTask.photos.map((p, idx) => {
+                    console.log("Raw photo path:", p.photo);
                     const url = getImageUrl(p.photo);
+                    console.log("Generated URL:", url);
                     return (
                       <div key={p.id} className="relative group">
+                        {/* THUMBNAIL - klik untuk preview */}
                         <img src={url} onClick={() => openPreview(photoUrls, idx)} className="w-24 h-24 object-cover rounded-lg border cursor-pointer hover:opacity-90 transition" alt="task" />
+
+                        {/* DOWNLOAD BUTTON */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -338,6 +393,8 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
                         >
                           ⬇
                         </button>
+
+                        {/* DELETE BUTTON */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -360,6 +417,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
             {/* LOG ACTIVITY */}
             <div>
               <h3 className="text-sm font-semibold mb-3">Log Activity</h3>
+
               {localTask.logs?.length ? (
                 <div className="space-y-3">
                   {[...localTask.logs]
@@ -383,13 +441,17 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
         </div>
       </div>
 
-      {/* MODAL PREVIEW FULLSCREEN */}
+      {/* ============================================ */}
+      {/* 🔥 MODAL PREVIEW FULLSCREEN (Dengan Zoom & Download) */}
+      {/* ============================================ */}
       {previewImage && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center" onClick={closePreview}>
+          {/* Tombol Close */}
           <button onClick={closePreview} className="absolute top-4 right-4 text-white text-2xl z-10 bg-black/50 rounded-full w-8 h-8 flex items-center justify-center">
             ✕
           </button>
 
+          {/* Tombol Download */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -403,6 +465,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
             Download
           </button>
 
+          {/* Tombol Prev */}
           {previewImages.length > 1 && currentPreviewIndex > 0 && (
             <button
               onClick={(e) => {
@@ -415,6 +478,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
             </button>
           )}
 
+          {/* Tombol Next */}
           {previewImages.length > 1 && currentPreviewIndex < previewImages.length - 1 && (
             <button
               onClick={(e) => {
@@ -427,12 +491,14 @@ export default function TaskDetailModal({ task, onClose, onUpdated }) {
             </button>
           )}
 
+          {/* Counter */}
           {previewImages.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
               {currentPreviewIndex + 1} / {previewImages.length}
             </div>
           )}
 
+          {/* Image dengan zoom support via css */}
           <img src={previewImage} alt="Preview" className="max-w-[95%] max-h-[95%] object-contain cursor-zoom-in" onClick={(e) => e.stopPropagation()} style={{ touchAction: "pinch-zoom" }} />
         </div>
       )}

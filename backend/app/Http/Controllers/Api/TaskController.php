@@ -291,11 +291,15 @@ class TaskController extends Controller
         $path = 'tasks/' . $filename;
 
         if (!Storage::disk('public')->exists($path)) {
-            return response()->json([
-                'message' => 'File tidak ditemukan'
-            ], 404);
+            return response()->json(['message' => 'File tidak ditemukan'], 404);
         }
 
-        return Storage::disk('public')->download($path);
+        $fullPath = Storage::disk('public')->path($path);
+
+        return response()->download($fullPath)->withHeaders([
+            'Access-Control-Allow-Origin'  => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Authorization, Content-Type',
+        ]);
     }
 }
