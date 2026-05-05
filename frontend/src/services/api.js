@@ -2,8 +2,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { getToken, removeToken } from "./storage";
 
-// export const BASE_URL = "https://api-itdesk.digisib.net";
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://api-itdesk.digisib.net";
+// export const BASE_URL = "http://localhost:8000";
 
 export const getImageUrl = (path) => {
   if (!path) return null;
