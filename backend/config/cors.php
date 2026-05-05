@@ -9,6 +9,7 @@ return [
         'https://itdesk.digisib.net',
         'http://localhost:3000',
         'http://localhost',
+        'https://localhost',
         'capacitor://localhost',
         'http://localhost:5173',
         'http://localhost:5174', // ← ini yang kurang
