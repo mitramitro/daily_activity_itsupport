@@ -68,13 +68,15 @@ Route::middleware('jwt')->group(function () {
     Route::prefix('tasks')->group(function () {
         Route::get('/', [TaskController::class, 'index']);
         Route::post('/', [TaskController::class, 'store']);
+
+        // ✅ Harus di atas {id} agar tidak konflik
+        Route::get('/photo/download/{filename}', [TaskController::class, 'downloadPhoto'])
+            ->middleware(['download.cors']); //sudah didaftarkan di bootstrap/app.php
+
         Route::get('{id}', [TaskController::class, 'show']);
         Route::put('{id}', [TaskController::class, 'update']);
         Route::delete('{id}', [TaskController::class, 'destroy']);
-        // 🔥 upload foto
         Route::post('{id}/photos', [TaskPhotoController::class, 'store']);
-        //download
-        Route::get('/photo/download/{filename}', [TaskController::class, 'downloadPhoto']);
     });
     Route::delete('/task-photos/{id}', [TaskPhotoController::class, 'destroy']);
     Route::get('/reports/tasks/export', [ReportsController::class, 'exportTasks']);

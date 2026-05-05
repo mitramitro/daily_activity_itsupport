@@ -295,17 +295,9 @@ class TaskController extends Controller
         }
 
         $fullPath = Storage::disk('public')->path($path);
-
-        // Ambil ekstensi dari filename asli, beri nama yang readable
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $downloadName = 'foto_task_' . date('Ymd_His') . '.' . $extension;
 
-        $response = response()->download($fullPath, $downloadName);
-
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-
-        return $response;
+        return response()->download($fullPath, $downloadName);
     }
 }

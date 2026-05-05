@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Http\Middleware\HandleCors;
+use App\Http\Middleware\DownloadCorsMiddleware;
 
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'jwt' => JwtMiddleware::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'download.cors' => DownloadCorsMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
