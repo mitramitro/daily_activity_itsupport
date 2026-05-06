@@ -4,6 +4,7 @@ import { getToken, removeToken } from "./storage";
 
 export const BASE_URL = "https://api-itdesk.digisib.net";
 // export const BASE_URL = "http://localhost:8000";
+// export const BASE_URL = "http://192.168.0.38:8000";
 
 export const getImageUrl = (path) => {
   if (!path) return null;

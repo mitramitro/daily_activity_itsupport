@@ -2,13 +2,21 @@
 
 namespace App\Http\Middleware;
 
+
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class DownloadCorsMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        Log::info('DownloadCorsMiddleware', [
+            'method' => $request->method(),
+            'origin' => $request->header('Origin'),
+            'url'    => $request->url(),
+        ]);
         $allowedOrigins = config('cors.allowed_origins');
         $origin = $request->header('Origin');
         $isAllowed = in_array($origin, $allowedOrigins);
