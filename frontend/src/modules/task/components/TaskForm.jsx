@@ -16,18 +16,32 @@ export default function TaskForm({ onSuccess, initialData, currentUser }) {
   const isNative = Capacitor.isNativePlatform(); // 🔥 cek apakah jalan di mobile
 
   //untuk default office berdasarkan user yang login (hanya saat create, kalau edit tidak diubah)
+  // useEffect(() => {
+  //   if (!isEditMode && currentUser?.office_id && offices.length) {
+  //     setForm((prev) => {
+  //       if (prev.office_id) return prev;
+
+  //       return {
+  //         ...prev,
+  //         office_id: Number(currentUser.office_id),
+  //       };
+  //     });
+  //   }
+  // }, [currentUser, offices, isEditMode]);
+
+  //supaya office id muncul semua saja tidak default, karena ada kemungkinan user yang login belum punya office_id
   useEffect(() => {
-    if (!isEditMode && currentUser?.office_id && offices.length) {
+    if (!isEditMode && offices.length) {
       setForm((prev) => {
         if (prev.office_id) return prev;
 
         return {
           ...prev,
-          office_id: Number(currentUser.office_id),
+          office_id: "", // atau offices[0]?.id kalau mau default ke office pertama
         };
       });
     }
-  }, [currentUser, offices, isEditMode]);
+  }, [offices, isEditMode]);
 
   const kategoriOptions = [
     { value: "PC", label: "PC" },
