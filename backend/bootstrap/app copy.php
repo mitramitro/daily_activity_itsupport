@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Http\Middleware\HandleCors;
+use App\Http\Middleware\DownloadCorsMiddleware;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,15 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // 🔥 Aktifkan CORS bawaan untuk API group
+        // WAJIB untuk CORS
         $middleware->api(prepend: [
             HandleCors::class,
         ]);
 
-        // Alias middleware
+        // Alias middleware custom
         $middleware->alias([
+            // 'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'jwt' => JwtMiddleware::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'download.cors' => DownloadCorsMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

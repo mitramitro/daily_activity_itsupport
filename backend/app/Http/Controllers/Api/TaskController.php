@@ -288,14 +288,20 @@ class TaskController extends Controller
 
     public function downloadPhoto($filename)
     {
-        $path = 'tasks/' . $filename;
+        // 🔥 Minimal: Decode filename
+        $decodedFilename = urldecode($filename);
+
+        // 🔥 Minimal: Prevent path traversal
+        $decodedFilename = basename($decodedFilename);
+
+        $path = 'tasks/' . $decodedFilename;
 
         if (!Storage::disk('public')->exists($path)) {
             return response()->json(['message' => 'File tidak ditemukan'], 404);
         }
 
         $fullPath = Storage::disk('public')->path($path);
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $extension = pathinfo($decodedFilename, PATHINFO_EXTENSION);
         $downloadName = 'foto_task_' . date('Ymd_His') . '.' . $extension;
 
         return response()->download($fullPath, $downloadName);
