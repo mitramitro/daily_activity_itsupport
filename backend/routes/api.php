@@ -69,12 +69,7 @@ Route::middleware('jwt')->group(function () {
         Route::get('/', [TaskController::class, 'index']);
         Route::post('/', [TaskController::class, 'store']);
 
-        // ✅ Harus di atas {id} agar tidak konflik
-        Route::options('/photo/download/{filename}', function () {
-            return response('', 200);
-        })->middleware(['download.cors']);
-        Route::get('/photo/download/{filename}', [TaskController::class, 'downloadPhoto'])
-            ->middleware(['download.cors']); //sudah didaftarkan di bootstrap/app.php
+        Route::get('/photo/download/{filename}', [TaskController::class, 'downloadPhoto']);
 
         Route::get('{id}', [TaskController::class, 'show']);
         Route::put('{id}', [TaskController::class, 'update']);
