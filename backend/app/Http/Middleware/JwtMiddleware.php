@@ -18,6 +18,9 @@ class JwtMiddleware
     public function handle(Request $request, Closure $next): Response
     {
 
+        if ($request->getMethod() === 'OPTIONS') {
+            return $next($request);
+        }
         try {
             JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
