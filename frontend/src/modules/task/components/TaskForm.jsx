@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core"; // 🔥 import Capacitor
-import { createTaskWithPhoto, updateTask, getEmployees, getOffices } from "../services/TaskService";
+import { createTaskWithPhoto, updateTask, getEmployees, getEmployeeOptions, getOffices } from "../services/TaskService";
 import { getImageUrl } from "../../../services/api";
 import toast from "react-hot-toast";
 
@@ -93,8 +93,8 @@ export default function TaskForm({ onSuccess, initialData, currentUser }) {
 
   const fetchEmployees = async () => {
     try {
-      const res = await getEmployees();
-      setEmployees(res.data.data);
+      const res = await getEmployeeOptions();
+      setEmployees(res.data);
     } catch (err) {
       console.error(err);
     }

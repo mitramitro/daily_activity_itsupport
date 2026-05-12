@@ -53,6 +53,7 @@ export const deleteTaskPhoto = (photoId) => api.delete(`/task-photos/${photoId}`
 // EMPLOYEES & OFFICES
 // ============================================
 export const getEmployees = () => api.get("/employees");
+export const getEmployeeOptions = () => api.get("/employees/options");
 export const getOffices = () => api.get("/offices");
 
 // Re-export getImageUrl agar komponen yang sudah import dari sini tidak perlu ubah

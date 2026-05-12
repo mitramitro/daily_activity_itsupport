@@ -43,6 +43,26 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
+    public function options(Request $request)
+    {
+        $search = $request->search;
+
+        $employees = Employee::query()
+            ->select(
+                'id',
+                'nama',
+                'nomor_pekerja',
+                'fungsi'
+            )
+            ->when($search, function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nomor_pekerja', 'like', "%{$search}%");
+            })
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json($employees);
+    }
 
     /**
      * STORE (CREATE)

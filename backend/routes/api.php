@@ -39,6 +39,7 @@ Route::middleware('jwt')->group(function () {
 
     // semua user login (admin & itsupport) bisa akses
     Route::get('employees', [EmployeeController::class, 'index']);
+    Route::get('employees/options', [EmployeeController::class, 'options']);
     Route::post('employees', [EmployeeController::class, 'store']);
     Route::get('employees/{id}', [EmployeeController::class, 'show']);
     Route::put('employees/{id}', [EmployeeController::class, 'update']);
