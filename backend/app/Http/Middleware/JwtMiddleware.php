@@ -17,10 +17,7 @@ class JwtMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 🔥 TAMBAHKAN INI: Biarkan OPTIONS request lewat tanpa auth
-        if ($request->isMethod('OPTIONS')) {
-            return $next($request);
-        }
+
         try {
             JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
