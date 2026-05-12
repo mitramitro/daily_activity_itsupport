@@ -1,20 +1,6 @@
 <?php
 
 
-// 🔥 FORCE CORS HEADERS - TARUH DI PALING ATAS, SEBELUM APAPUN
-header('Access-Control-Allow-Origin: https://localhost');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Max-Age: 86400');
-
-// Handle OPTIONS preflight request langsung
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-// 🔥 SAMPAI SINI
-
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
