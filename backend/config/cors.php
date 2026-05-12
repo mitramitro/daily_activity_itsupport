@@ -23,6 +23,7 @@ return [
     'allowed_origins' => [
         'https://itdesk.digisib.net',      // Production frontend
         'capacitor://localhost',            // Capacitor native app
+        'https://localhost',                 // 🔥 TAMBAHKAN INI untuk Capacitor dengan scheme https
         'http://localhost',                 // Local development
         'http://localhost:3000',            // React dev server (default)
         'http://localhost:5173',            // Vite dev server
