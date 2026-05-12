@@ -73,6 +73,10 @@ export default function TaskListPage() {
         {/* HEADER */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-lg font-semibold">Task List</h1>
+          <button onClick={() => navigate("/tasks/create")} className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+            <Plus size={16} />
+            Create Task
+          </button>
         </div>
 
         {/* 🔥 JENIS TASK FILTER (BUTTON) */}
