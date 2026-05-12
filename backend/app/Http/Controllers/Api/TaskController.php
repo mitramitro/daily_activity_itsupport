@@ -304,6 +304,10 @@ class TaskController extends Controller
         $extension = pathinfo($decodedFilename, PATHINFO_EXTENSION);
         $downloadName = 'foto_task_' . date('Ymd_His') . '.' . $extension;
 
-        return response()->download($fullPath, $downloadName);
+        return response()->download($fullPath, $downloadName, [
+            'Cache-Control' => 'no-cache, no-store, must-revalidate', // ✅ CDN tidak cache
+            'Pragma'        => 'no-cache',
+            'Vary'          => 'Origin',                              // ✅ CORS aware
+        ]);
     }
 }
