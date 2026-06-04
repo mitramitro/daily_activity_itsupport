@@ -24,12 +24,23 @@ Route::get('/test-cors', function () {
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('register');
     Route::post('login', [AuthController::class, 'login'])->name('login');
+    // Public: refresh token (bisa expired)
+    Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh');
+    // Public: cek fingerprint user sebelum login
+    Route::post('check-fingerprint-user', [AuthController::class, 'checkFingerprintUser']);
+    // Public: login dengan fingerprint
+    Route::post('login/fingerprint', [AuthController::class, 'loginFingerprint']);
 
     Route::middleware('jwt')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('me', [AuthController::class, 'me'])->name('me');
-        Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh');
     });
+});
+
+// Protected: enable/disable fingerprint
+Route::middleware('jwt')->group(function () {
+    Route::post('fingerprint/enable', [AuthController::class, 'enableFingerprint']);
+    Route::post('fingerprint/disable', [AuthController::class, 'disableFingerprint']);
 });
 
 Route::middleware('jwt')->group(function () {

@@ -102,12 +102,21 @@ class AuthController extends Controller
     }
 
     /**
-     * Refresh token
+     * Refresh token (bisa dipanggil dengan token expired)
      */
-    public function refresh()
+    public function refresh(Request $request)
     {
         try {
-            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+            $token = JWTAuth::getToken();
+
+            if (!$token) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Token tidak ditemukan'
+                ], 401);
+            }
+
+            $newToken = JWTAuth::refresh($token);
 
             return response()->json([
                 'status'  => 'success',
@@ -117,8 +126,7 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Failed to refresh token',
-                'error'   => $e->getMessage()
+                'message' => 'Token tidak bisa di-refresh, silakan login ulang'
             ], 401);
         }
     }
@@ -145,6 +153,112 @@ class AuthController extends Controller
         }
     }
 
+    // ============================================
+    // FINGERPRINT
+    // ============================================
+
+    /**
+     * Cek status fingerprint user (sebelum login)
+     * POST /auth/check-fingerprint-user
+     */
+    public function checkFingerprintUser(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        return response()->json([
+            'fingerprint_enabled' => (bool) $user->fingerprint_enabled,
+        ]);
+    }
+
+    /**
+     * Aktifkan fingerprint (harus login)
+     * POST /fingerprint/enable
+     */
+    public function enableFingerprint(Request $request)
+    {
+        $request->validate([
+            'password'          => 'required|string',
+            'fingerprint_token' => 'required|string|min:10',
+            'device_id'         => 'required|string|min:5',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Password salah'], 403);
+        }
+
+        $hashedToken = Hash::make($request->fingerprint_token);
+
+        $user->update([
+            'fingerprint_enabled'    => true,
+            'fingerprint_token_hash' => $hashedToken,
+            'device_id'              => $request->device_id,
+        ]);
+
+        return response()->json([
+            'message'            => 'Fingerprint berhasil diaktifkan',
+            'fingerprint_enabled' => true,
+        ]);
+    }
+
+    /**
+     * Nonaktifkan fingerprint (harus login)
+     * POST /fingerprint/disable
+     */
+    public function disableFingerprint(Request $request)
+    {
+        $user = auth()->user();
+
+        $user->update([
+            'fingerprint_enabled'    => false,
+            'fingerprint_token_hash' => null,
+            'device_id'              => null,
+        ]);
+
+        return response()->json([
+            'message'             => 'Fingerprint berhasil dinonaktifkan',
+            'fingerprint_enabled' => false,
+        ]);
+    }
+
+    /**
+     * Login dengan fingerprint (tanpa JWT)
+     * POST /auth/login/fingerprint
+     */
+    public function loginFingerprint(Request $request)
+    {
+        $request->validate([
+            'fingerprint_token' => 'required|string',
+            'device_id'         => 'required|string',
+        ]);
+
+        $user = User::where('device_id', $request->device_id)
+            ->where('fingerprint_enabled', true)
+            ->first();
+
+        if (!$user || !Hash::check($request->fingerprint_token, $user->fingerprint_token_hash)) {
+            return response()->json(['error' => 'Fingerprint tidak valid'], 401);
+        }
+
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type'   => 'bearer',
+            'expires_in'   => JWTAuth::factory()->getTTL() * 60,
+            'user'         => $user->load('office'),
+        ]);
+    }
+
+    // ============================================
+    // HELPERS
+    // ============================================
+
     /**
      * Helper: format token response
      */
@@ -153,7 +267,7 @@ class AuthController extends Controller
         return [
             'access_token' => $token,
             'token_type'   => 'bearer',
-            'expires_in'   => JWTAuth::factory()->getTTL() * 60, // dalam detik
+            'expires_in'   => JWTAuth::factory()->getTTL() * 60,
         ];
     }
 }

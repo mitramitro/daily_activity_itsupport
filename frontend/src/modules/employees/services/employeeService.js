@@ -6,6 +6,10 @@ export const getEmployees = (params) => {
   });
 };
 
+export const getEmployeeOptions = () => {
+  return api.get("/employees/options");
+};
+
 export const createEmployee = (data) => {
   return api.post("/employees", data);
 };

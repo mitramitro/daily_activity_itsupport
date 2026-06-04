@@ -27,6 +27,9 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role',
         'office_id',
+        'fingerprint_enabled',
+        'fingerprint_token_hash',
+        'device_id',
     ];
 
     /**
@@ -37,7 +40,17 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'fingerprint_token_hash',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'fingerprint_enabled' => 'boolean',
+        ];
+    }
 
     public function office()
     {
@@ -61,16 +74,4 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 }

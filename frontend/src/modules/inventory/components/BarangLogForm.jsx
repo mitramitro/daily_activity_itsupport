@@ -1,10 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Select from "react-select";
+import toast from "react-hot-toast";
 import { createBarangLog } from "../services/barangLogService";
 import { getBarang } from "../services/barangService";
-import { getEmployees } from "../../employees/services/employeeService";
+import { getEmployeeOptions } from "../../employees/services/employeeService";
 import api from "../../../services/api";
 
+const selectStyle = {
+  control: (base, state) => ({
+    ...base,
+    backgroundColor: "#f9fafb",
+    border: state.isFocused ? "2px solid #3b82f6" : "1px solid #e5e7eb",
+    boxShadow: "none",
+    borderRadius: "8px",
+    minHeight: "38px",
+    "&:hover": {
+      borderColor: state.isFocused ? "#3b82f6" : "#d1d5db",
+    },
+  }),
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+};
+
 export default function BarangLogForm({ onSuccess, onClose, user }) {
+  const formRef = useRef(null);
   const [barangList, setBarangList] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [offices, setOffices] = useState([]);
@@ -25,13 +43,27 @@ export default function BarangLogForm({ onSuccess, onClose, user }) {
     to_office_id: "",
   });
 
+  const employeeOptions = employees.map((e) => ({
+    value: e.id,
+    label: `${e.nama} - ${e.nomor_pekerja} - ${e.fungsi || "-"}`,
+  }));
+
   useEffect(() => {
     const fetchData = async () => {
-      const [barangRes, empRes, officeRes] = await Promise.all([getBarang(), getEmployees(), api.get("/offices")]);
+      try {
+        const [barangRes, empRes, officeRes] = await Promise.all([
+          getBarang(),
+          getEmployeeOptions(),
+          api.get("/offices"),
+        ]);
 
-      setBarangList(barangRes.data.data);
-      setEmployees(empRes.data.data);
-      setOffices(officeRes.data.data);
+        setBarangList(barangRes.data.data);
+        setEmployees(empRes.data);
+        setOffices(officeRes.data.data);
+      } catch (err) {
+        console.error(err);
+        toast.error("Gagal memuat data");
+      }
     };
 
     fetchData();
@@ -56,6 +88,13 @@ export default function BarangLogForm({ onSuccess, onClose, user }) {
     }));
   };
 
+  const handleEmployeeChange = (field, selected) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: selected?.value || "",
+    }));
+  };
+
   const validate = () => {
     if (!form.barang_id) return "Pilih barang";
     if (!form.qty || form.qty <= 0) return "Qty tidak valid";
@@ -75,22 +114,23 @@ export default function BarangLogForm({ onSuccess, onClose, user }) {
     e.preventDefault();
 
     const error = validate();
-    if (error) return alert(error);
+    if (error) return toast.error(error);
 
     setLoading(true);
 
     try {
       await createBarangLog(form);
+      toast.success("Transaksi berhasil disimpan");
       onSuccess();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal simpan");
+      toast.error(err.response?.data?.message || "Gagal simpan");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
       {/* INFO */}
       <div className="bg-blue-50 border border-blue-200 p-3 rounded text-sm">
         {form.type === "IN" && (
@@ -131,28 +171,30 @@ export default function BarangLogForm({ onSuccess, onClose, user }) {
       {form.type === "OUT" && (
         <div>
           <label className="block text-sm font-medium mb-1">Ke Employee *</label>
-          <select name="to_employee_id" value={form.to_employee_id} onChange={handleChange} className="w-full border rounded-lg p-2">
-            <option value="">Pilih Employee</option>
-            {employees.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.nama}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={employeeOptions}
+            value={employeeOptions.find((opt) => opt.value === form.to_employee_id) || null}
+            onChange={(selected) => handleEmployeeChange("to_employee_id", selected)}
+            menuPortalTarget={document.body}
+            styles={selectStyle}
+            placeholder="Ketik nama employee..."
+            noOptionsMessage={() => "Tidak ditemukan"}
+          />
         </div>
       )}
 
       {form.type === "IN" && (
         <div>
           <label className="block text-sm font-medium mb-1">Dari Employee *</label>
-          <select name="from_employee_id" value={form.from_employee_id} onChange={handleChange} className="w-full border rounded-lg p-2">
-            <option value="">Pilih Employee</option>
-            {employees.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.nama}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={employeeOptions}
+            value={employeeOptions.find((opt) => opt.value === form.from_employee_id) || null}
+            onChange={(selected) => handleEmployeeChange("from_employee_id", selected)}
+            menuPortalTarget={document.body}
+            styles={selectStyle}
+            placeholder="Ketik nama employee..."
+            noOptionsMessage={() => "Tidak ditemukan"}
+          />
         </div>
       )}
 

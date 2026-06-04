@@ -23,6 +23,11 @@
     },
     "SystemBars": {
       "insetsHandling": "disable"
+    },
+    "Biometrics": {
+      "android": {
+        "useAndroidX": true
+      }
     }
   }
 }
