@@ -13,18 +13,6 @@ export const getImageUrl = (path) => {
   return `${BASE_URL}/storage/${cleaned}`;
 };
 
-export const downloadBlob = async (url) => {
-  const token = await getToken();
-
-  const response = await axios.get(url, {
-    responseType: "blob",
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-
-  return response.data;
-};
-
 // ============================================
 // UNAUTHORIZED HANDLER
 // ============================================

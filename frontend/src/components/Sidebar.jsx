@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ClipboardList, Users, Box, Network, Wifi, Radio } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext"; // sesuaikan path
+import { LayoutDashboard, ClipboardList, Users, Box, Settings, Network, Wifi, Radio } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Sidebar({ collapsed }) {
   const { user } = useAuth();
@@ -9,6 +9,7 @@ export default function Sidebar({ collapsed }) {
     { name: "Tasks", icon: <ClipboardList size={20} />, link: "/tasks" },
     { name: "Employees", icon: <Users size={20} />, link: "/employees" },
     { name: "Inventory", icon: <Box size={20} />, link: "/inventory" },
+    { name: "Pengaturan", icon: <Settings size={20} />, link: "/settings" },
     ...(user?.role === "admin"
       ? [
           {

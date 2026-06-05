@@ -167,7 +167,7 @@ export const getLastUserEmail = async () => {
 // 🔐 HAPUS SEMUA DATA (logout)
 export const clearAllData = async () => {
   try {
-    const keys = [TOKEN_KEY, USER_KEY, DEVICE_ID_KEY, FINGERPRINT_TOKEN_KEY, LAST_USER_EMAIL_KEY];
+    const keys = [TOKEN_KEY, USER_KEY];
 
     if (isNative) {
       for (const key of keys) {

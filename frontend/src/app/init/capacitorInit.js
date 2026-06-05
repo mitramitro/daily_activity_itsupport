@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
+import { App } from "@capacitor/app";
 
 export const initCapacitor = async () => {
   if (!Capacitor.isNativePlatform()) {
@@ -30,6 +31,18 @@ export const initCapacitor = async () => {
       color: "#ffffff",
     });
     console.log("[StatusBar] Background color set to #ffffff");
+
+    // ============================================
+    // BACK BUTTON HANDLER
+    // ============================================
+    App.addListener("backButton", ({ canGoBack }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        App.exitApp();
+      }
+    });
+    console.log("[Capacitor] Back button listener registered");
 
     // ============================================
     // OPTIONAL: HIDE STATUS BAR (Jika perlu full immersive)

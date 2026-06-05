@@ -98,6 +98,7 @@ Route::middleware('jwt')->group(function () {
     });
     Route::delete('/task-photos/{id}', [TaskPhotoController::class, 'destroy']);
     Route::get('/reports/tasks/export', [ReportsController::class, 'exportTasks']);
+    Route::get('/reports/inventory/export', [ReportsController::class, 'exportBarangLogs']);
     Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
     Route::get('/dashboard/recent', [DashboardController::class, 'recentTasks']);
     // Admin only

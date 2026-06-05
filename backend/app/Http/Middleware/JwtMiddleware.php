@@ -22,6 +22,11 @@ class JwtMiddleware
             return $next($request);
         }
         try {
+            // Fallback: ambil token dari query param (untuk download via window.open)
+            if (!$request->bearerToken() && $request->query('token')) {
+                $request->headers->set('Authorization', 'Bearer ' . $request->query('token'));
+            }
+
             JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
             return response()->json(['error' => 'Unauthorized'], 401);

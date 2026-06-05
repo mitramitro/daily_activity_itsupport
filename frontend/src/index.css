@@ -29,6 +29,42 @@
   --color-primary: #0061ff;
   --color-primary-dark: #004ecc;
   --color-bg-light: #f0f7ff;
+
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8fafc;
+  --color-border-light: #f1f5f9;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up-sm {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s ease-out;
+}
+
+.animate-slide-up-sm {
+  animation: slide-up-sm 0.25s ease-out;
 }
 
 /* ============================================

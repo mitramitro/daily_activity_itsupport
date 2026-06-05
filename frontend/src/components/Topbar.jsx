@@ -56,7 +56,8 @@ export default function Topbar({ collapsed, setCollapsed }) {
           <Menu size={20} />
         </button>
 
-        <h1 className="font-semibold">ITDesk</h1>
+        <img src="/logo.png" alt="logo" className="w-8 h-8 rounded-lg object-contain" />
+        <h1 className="font-semibold text-gray-800">ITDesk</h1>
       </div>
 
       {/* RIGHT */}
@@ -90,7 +91,15 @@ export default function Topbar({ collapsed, setCollapsed }) {
             Profile
           </button>
 
-          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50">Settings</button>
+          <button
+            onClick={() => {
+              setOpen(false);
+              navigate("/settings");
+            }}
+            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+          >
+            Settings
+          </button>
 
           <div className="border-t"></div>
 

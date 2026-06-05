@@ -52,20 +52,12 @@ export default function ReportTaskPage() {
   // 🔥 export excel
   const handleExport = async () => {
     try {
-      const res = await exportTasks({
+      await exportTasks({
         search,
         status,
         tanggal_dari: tanggalDari,
         tanggal_sampai: tanggalSampai,
       });
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.setAttribute("download", "report-task.xlsx");
-      document.body.appendChild(link);
-      link.click();
 
       toast.success("Export berhasil");
     } catch (err) {

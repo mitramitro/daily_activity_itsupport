@@ -23,11 +23,15 @@ const ReportsPage = Loadable(lazy(() => import("../modules/reports/pages/Reports
 
 const ReportTaskPage = Loadable(lazy(() => import("../modules/reports/pages/ReportTaskPage")));
 
+const ReportInventoryPage = Loadable(lazy(() => import("../modules/reports/pages/ReportInventoryPage")));
+
 const UsersPage = Loadable(lazy(() => import("../modules/users/pages/UsersPage")));
 
 const InventoryPage = Loadable(lazy(() => import("../modules/inventory/pages/InventoryPage")));
 
 const BarangPage = Loadable(lazy(() => import("../modules/inventory/pages/BarangPage")));
+
+const SettingsPage = Loadable(lazy(() => import("../modules/settings/pages/SettingsPage")));
 
 export const router = createBrowserRouter([
   {
@@ -85,6 +89,10 @@ export const router = createBrowserRouter([
         path: "reports/tasks",
         element: <ReportTaskPage />,
       },
+      {
+        path: "reports/inventory",
+        element: <ReportInventoryPage />,
+      },
 
       {
         path: "inventory",
@@ -93,6 +101,11 @@ export const router = createBrowserRouter([
       {
         path: "barang",
         element: <BarangPage />,
+      },
+
+      {
+        path: "settings",
+        element: <SettingsPage />,
       },
     ],
   },
