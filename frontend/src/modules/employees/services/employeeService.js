@@ -24,5 +24,5 @@ export const deleteEmployee = (id) => {
 
 // 🔹 ambil office
 export const getOffices = () => {
-  return api.get("/offices");
+  return api.get("/offices/options");
 };

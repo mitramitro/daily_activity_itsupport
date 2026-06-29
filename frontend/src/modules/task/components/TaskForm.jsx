@@ -103,7 +103,7 @@ export default function TaskForm({ onSuccess, initialData, currentUser }) {
   const fetchOffices = async () => {
     try {
       const res = await getOffices();
-      setOffices(res.data.data);
+      setOffices(res.data);
     } catch (err) {
       console.error(err);
     }

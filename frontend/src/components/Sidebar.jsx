@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ClipboardList, Users, Box, Settings, Network, Wifi, Radio } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Users, Box, Settings, Network, Wifi, Radio, Building2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Sidebar({ collapsed }) {
@@ -16,6 +16,11 @@ export default function Sidebar({ collapsed }) {
             name: "Users",
             icon: <Users size={20} />,
             link: "/users",
+          },
+          {
+            name: "Offices",
+            icon: <Building2 size={20} />,
+            link: "/offices",
           },
         ]
       : []),

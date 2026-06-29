@@ -23,7 +23,7 @@ export default function EmployeeForm({ onSubmit, onCancel, initialData }) {
     const fetchOffices = async () => {
       try {
         const res = await getOffices();
-        setOffices(res.data.data);
+        setOffices(res.data);
       } catch (err) {
         console.error(err);
       }

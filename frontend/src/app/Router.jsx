@@ -33,6 +33,8 @@ const BarangPage = Loadable(lazy(() => import("../modules/inventory/pages/Barang
 
 const SettingsPage = Loadable(lazy(() => import("../modules/settings/pages/SettingsPage")));
 
+const OfficesPage = Loadable(lazy(() => import("../modules/offices/pages/OfficesPage")));
+
 export const router = createBrowserRouter([
   {
     path: "/login",
@@ -101,6 +103,11 @@ export const router = createBrowserRouter([
       {
         path: "barang",
         element: <BarangPage />,
+      },
+
+      {
+        path: "offices",
+        element: <OfficesPage />,
       },
 
       {

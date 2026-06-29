@@ -1,23 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\TaskPhotoController;
-use App\Http\Controllers\Api\OfficeController;
-use App\Http\Controllers\Api\ReportsController;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BarangController;
 use App\Http\Controllers\Api\BarangLogController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\OfficeController;
+use App\Http\Controllers\Api\ReportsController;
 use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\TaskPhotoController;
+use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
 
 // 🔥 TEST CORS - Temporary
 Route::get('/test-cors', function () {
     return response()->json([
         'message' => 'CORS test OK',
-        'time' => now()->toDateTimeString()
+        'time' => now()->toDateTimeString(),
     ]);
 });
 
@@ -53,7 +53,12 @@ Route::middleware('jwt')->group(function () {
     Route::put('employees/{id}', [EmployeeController::class, 'update']);
     Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
 
+    Route::get('offices/options', [OfficeController::class, 'options']);
     Route::get('offices', [OfficeController::class, 'index']);
+    Route::post('offices', [OfficeController::class, 'store']);
+    Route::get('offices/{id}', [OfficeController::class, 'show']);
+    Route::put('offices/{id}', [OfficeController::class, 'update']);
+    Route::delete('offices/{id}', [OfficeController::class, 'destroy']);
     // ======================
     // INVENTORY - BARANG
     // ======================
