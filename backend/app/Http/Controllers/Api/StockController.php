@@ -10,15 +10,19 @@ class StockController extends Controller
 {
     public function index(Request $request)
     {
-        $data = BarangStock::with([
+        $query = BarangStock::with([
             'barang:id,name,type,unit',
-            'office:id,name'
-        ])
-            ->orderBy('barang_id')
-            ->get();
+            'office:id,name',
+        ]);
+
+        if ($request->filled('office_id')) {
+            $query->where('office_id', $request->office_id);
+        }
+
+        $data = $query->orderBy('barang_id')->get();
 
         return response()->json([
-            'data' => $data
+            'data' => $data,
         ]);
     }
 }

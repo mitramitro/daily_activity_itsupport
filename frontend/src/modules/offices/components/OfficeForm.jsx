@@ -1,15 +1,35 @@
 import { useEffect, useState } from "react";
+import { getOfficeOptions } from "../services/officeService";
 
 export default function OfficeForm({ onSubmit, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
+  const [parentOfficeId, setParentOfficeId] = useState("");
+  const [officeOptions, setOfficeOptions] = useState([]);
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || "");
+      setParentOfficeId(initialData.parent_office_id || "");
     } else {
       setName("");
+      setParentOfficeId("");
     }
+  }, [initialData]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await getOfficeOptions();
+        const filtered = (res.data || []).filter(
+          (o) => o.id !== initialData?.id
+        );
+        setOfficeOptions(filtered);
+      } catch {
+        // silent
+      }
+    };
+    fetch();
   }, [initialData]);
 
   const handleSubmit = async (e) => {
@@ -19,7 +39,10 @@ export default function OfficeForm({ onSubmit, onCancel, initialData }) {
 
     try {
       setLoading(true);
-      await onSubmit({ name: name.trim() });
+      await onSubmit({
+        name: name.trim(),
+        parent_office_id: parentOfficeId || null,
+      });
     } finally {
       setLoading(false);
     }
@@ -41,6 +64,23 @@ export default function OfficeForm({ onSubmit, onCancel, initialData }) {
           required
           minLength={2}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Parent Office (opsional)</label>
+        <select
+          value={parentOfficeId}
+          onChange={(e) => setParentOfficeId(e.target.value)}
+          className={inputClass}
+        >
+          <option value="">Tidak ada parent</option>
+          {officeOptions.map((o) => (
+            <option key={o.id} value={o.id}>{o.name}</option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-400 mt-1">
+          Parent office digunakan untuk menggabungkan stok inventory.
+        </p>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">

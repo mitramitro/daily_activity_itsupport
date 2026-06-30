@@ -20,7 +20,8 @@ class OfficeController extends Controller
         $search = $request->search;
         $limit = $request->limit ?? 10;
 
-        $offices = Office::select('id', 'name')
+        $offices = Office::select('id', 'name', 'parent_office_id')
+            ->with('parent:id,name')
             ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->orderBy('name')
             ->paginate($limit);
@@ -32,10 +33,12 @@ class OfficeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:offices,name',
+            'parent_office_id' => 'nullable|exists:offices,id',
         ]);
 
         $office = Office::create([
             'name' => $request->name,
+            'parent_office_id' => $request->parent_office_id,
         ]);
 
         return response()->json([
@@ -46,7 +49,7 @@ class OfficeController extends Controller
 
     public function show($id)
     {
-        $office = Office::findOrFail($id);
+        $office = Office::with('parent:id,name')->findOrFail($id);
 
         return response()->json([
             'data' => $office,
@@ -59,10 +62,12 @@ class OfficeController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255|unique:offices,name,'.$id,
+            'parent_office_id' => 'nullable|exists:offices,id|different:'.$id,
         ]);
 
         $office->update([
             'name' => $request->name,
+            'parent_office_id' => $request->parent_office_id,
         ]);
 
         return response()->json([
@@ -76,6 +81,11 @@ class OfficeController extends Controller
         $office = Office::findOrFail($id);
 
         $relations = [];
+
+        $countChildren = $office->children()->count();
+        if ($countChildren > 0) {
+            $relations[] = "{$countChildren} child office";
+        }
 
         $countEmployees = $office->employees()->count();
         if ($countEmployees > 0) {

@@ -4,6 +4,10 @@ export const getOffices = (params) => {
   return api.get("/offices", { params });
 };
 
+export const getOfficeOptions = () => {
+  return api.get("/offices/options");
+};
+
 export const createOffice = (data) => {
   return api.post("/offices", data);
 };

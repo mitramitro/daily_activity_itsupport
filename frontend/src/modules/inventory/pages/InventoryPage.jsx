@@ -37,6 +37,8 @@ export default function InventoryPage() {
   const [openModal, setOpenModal] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  const effectiveOfficeId = user?.effective_office_id || user?.office?.parent_office_id || user?.office_id;
+
   // ======================
   // FETCH
   // ======================
@@ -45,7 +47,7 @@ export default function InventoryPage() {
 
     setLoading(true);
     try {
-      const res = await getBarangLogs(params);
+      const res = await getBarangLogs({ ...params, office_id: effectiveOfficeId || undefined });
       setData(res.data.data);
     } catch (err) {
       console.error("Error fetch logs:", err);

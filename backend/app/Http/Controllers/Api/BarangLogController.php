@@ -20,11 +20,15 @@ class BarangLogController extends Controller
         // PARAMS
         // ======================
         $search = trim($request->get('search', ''));
-        $limit  = (int) $request->get('limit', 10);
+        $limit = (int) $request->get('limit', 10);
 
         // 🔥 limit guard (anti abuse)
-        if ($limit <= 0) $limit = 10;
-        if ($limit > 100) $limit = 100;
+        if ($limit <= 0) {
+            $limit = 10;
+        }
+        if ($limit > 100) {
+            $limit = 100;
+        }
 
         // ======================
         // QUERY
@@ -55,13 +59,13 @@ class BarangLogController extends Controller
                 'toEmployee:id,nama,office_id',
                 'toEmployee.office:id,name',
 
-                'creator:id,name'
+                'creator:id,name',
             ]);
 
         // ======================
         // SEARCH (SERVER SIDE)
         // ======================
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('barang', function ($q2) use ($search) {
                     $q2->where('name', 'like', "%{$search}%");
@@ -73,6 +77,16 @@ class BarangLogController extends Controller
                         $q2->where('nama', 'like', "%{$search}%");
                     })
                     ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        // ======================
+        // FILTER BY OFFICE
+        // ======================
+        if ($request->filled('office_id')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('from_office_id', $request->office_id)
+                    ->orWhere('to_office_id', $request->office_id);
             });
         }
 
@@ -109,33 +123,33 @@ class BarangLogController extends Controller
             'to_employee_id' => 'nullable|exists:employees,id',
 
             'condition' => 'nullable|in:baru,bekas,rusak',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
         ]);
 
         $user = auth()->user();
 
-        if (!$user->office_id) {
+        if (! $user->office_id) {
             return response()->json([
-                'message' => 'User tidak memiliki office'
+                'message' => 'User tidak memiliki office',
             ], 403);
         }
 
         return DB::transaction(function () use ($request, $user) {
 
             $barang = Barang::lockForUpdate()->findOrFail($request->barang_id);
-            $userOfficeId = $user->office_id;
+            $userOfficeId = $user->office->effectiveOfficeId();
 
             // ======================
             // 🔥 VALIDASI BISNIS
             // ======================
             if ($request->type === 'OUT') {
-                if (!$request->to_employee_id) {
+                if (! $request->to_employee_id) {
                     throw new \Exception('Pilih employee tujuan');
                 }
             }
 
             if ($request->type === 'IN') {
-                if (!$request->from_employee_id) {
+                if (! $request->from_employee_id) {
                     throw new \Exception('Pilih employee asal');
                 }
             }
@@ -163,10 +177,10 @@ class BarangLogController extends Controller
 
                 $stock = BarangStock::where([
                     'barang_id' => $barang->id,
-                    'office_id' => $fromOffice
+                    'office_id' => $fromOffice,
                 ])->lockForUpdate()->first();
 
-                if (!$stock || $stock->stock < $request->qty) {
+                if (! $stock || $stock->stock < $request->qty) {
                     throw new \Exception('Stock tidak cukup di office ini');
                 }
 
@@ -177,7 +191,7 @@ class BarangLogController extends Controller
 
                 $stock = BarangStock::firstOrCreate([
                     'barang_id' => $barang->id,
-                    'office_id' => $toOffice
+                    'office_id' => $toOffice,
                 ]);
 
                 $stock->increment('stock', $request->qty);
@@ -201,12 +215,12 @@ class BarangLogController extends Controller
                 'notes' => $request->notes,
                 'tanggal' => $request->tanggal,
 
-                'created_by' => $user->id
+                'created_by' => $user->id,
             ]);
 
             return response()->json([
                 'message' => 'Transaksi berhasil',
-                'data' => $log
+                'data' => $log,
             ], 201);
         });
     }
@@ -222,11 +236,11 @@ class BarangLogController extends Controller
             'toOffice',
             'fromEmployee',
             'toEmployee',
-            'creator'
+            'creator',
         ])->findOrFail($id);
 
         return response()->json([
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -245,7 +259,7 @@ class BarangLogController extends Controller
 
                 $stock = BarangStock::where([
                     'barang_id' => $barang->id,
-                    'office_id' => $log->to_office_id
+                    'office_id' => $log->to_office_id,
                 ])->lockForUpdate()->first();
 
                 if ($stock && $stock->stock < $log->qty) {
@@ -259,7 +273,7 @@ class BarangLogController extends Controller
 
                 $stock = BarangStock::firstOrCreate([
                     'barang_id' => $barang->id,
-                    'office_id' => $log->from_office_id
+                    'office_id' => $log->from_office_id,
                 ]);
 
                 $stock->increment('stock', $log->qty);
@@ -268,7 +282,7 @@ class BarangLogController extends Controller
             $log->delete();
 
             return response()->json([
-                'message' => 'Data berhasil dihapus'
+                'message' => 'Data berhasil dihapus',
             ]);
         });
     }

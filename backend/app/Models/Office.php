@@ -6,7 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Office extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'parent_office_id'];
+
+    public function parent()
+    {
+        return $this->belongsTo(Office::class, 'parent_office_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Office::class, 'parent_office_id');
+    }
+
+    public function effectiveOfficeId()
+    {
+        return $this->parent_office_id ?? $this->id;
+    }
 
     public function tasks()
     {

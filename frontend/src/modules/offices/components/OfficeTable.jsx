@@ -20,6 +20,7 @@ export default function OfficeTable({ offices, onRowClick, loading }) {
         <tr>
           <th className="px-4 py-3 text-left w-16">No</th>
           <th className="px-4 py-3 text-left">Nama Office</th>
+          <th className="px-4 py-3 text-left">Parent</th>
           <th className="px-4 py-3 text-right">Aksi</th>
         </tr>
       </thead>
@@ -27,7 +28,7 @@ export default function OfficeTable({ offices, onRowClick, loading }) {
       <tbody>
         {loading && (
           <tr>
-            <td colSpan="3" className="text-center py-4 text-gray-400">
+            <td colSpan="4" className="text-center py-4 text-gray-400">
               Loading...
             </td>
           </tr>
@@ -35,7 +36,7 @@ export default function OfficeTable({ offices, onRowClick, loading }) {
 
         {!loading && (!offices || offices.length === 0) && (
           <tr>
-            <td colSpan="3" className="text-center py-4 text-gray-400">
+            <td colSpan="4" className="text-center py-4 text-gray-400">
               Tidak ada data
             </td>
           </tr>
@@ -50,6 +51,7 @@ export default function OfficeTable({ offices, onRowClick, loading }) {
             >
               <td className="px-4 py-3 text-gray-500">{index + 1}.</td>
               <td className="px-4 py-3 font-medium text-gray-800">{office.name}</td>
+              <td className="px-4 py-3 text-gray-500">{office.parent?.name || "-"}</td>
               <td className="px-4 py-3 text-right">
                 <button
                   onClick={(e) => {

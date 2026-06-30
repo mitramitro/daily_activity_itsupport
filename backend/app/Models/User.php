@@ -7,11 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use App\Models\Office;
-
 
 class User extends Authenticatable implements JWTSubject
-
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -52,9 +49,16 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    protected $appends = ['effective_office_id'];
+
     public function office()
     {
         return $this->belongsTo(Office::class);
+    }
+
+    public function getEffectiveOfficeIdAttribute()
+    {
+        return $this->office?->effectiveOfficeId();
     }
 
     /**
@@ -72,6 +76,4 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-
-
 }
