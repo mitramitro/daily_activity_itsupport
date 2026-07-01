@@ -18,15 +18,15 @@ export default function StockPage() {
 
   return (
     <>
-      {/* MOBILE */}
-      <div className="grid gap-3 md:hidden">
-        {data.map((row) => (
-          <StockCard key={row.id} data={row} />
-        ))}
+      <div className="divide-y divide-gray-100 md:hidden">
+        {data.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm px-4 py-8">Belum ada stok</p>
+        ) : (
+          data.map((row) => <StockCard key={row.id} data={row} />)
+        )}
       </div>
 
-      {/* DESKTOP */}
-      <div className="hidden md:block">
+      <div className="hidden md:block p-4 md:p-6">
         <StockTable data={data} />
       </div>
     </>

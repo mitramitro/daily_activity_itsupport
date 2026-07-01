@@ -1,62 +1,40 @@
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
-export default function BarangLogCard({ data, onDelete, onClick }) {
+export default function BarangLogCard({ data, onClick }) {
   const formatDate = (date) => {
     if (!date) return "-";
-    return new Date(date).toLocaleString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const d = new Date(date);
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = months[d.getMonth()];
+    const hours = String(d.getHours()).padStart(2, "0");
+    const mins = String(d.getMinutes()).padStart(2, "0");
+    return `${day} ${month}, ${hours}:${mins}`;
   };
 
   const isIn = data.type === "IN";
 
   return (
-    <div onClick={() => onClick?.(data)} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 active:scale-[0.98] transition-transform cursor-pointer">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isIn ? "bg-green-100" : "bg-red-100"}`}>
-            {isIn ? <ArrowDown size={16} className="text-green-600" /> : <ArrowUp size={16} className="text-red-600" />}
+    <div onClick={() => onClick?.(data)} className="px-4 py-3 active:bg-gray-50 transition-colors cursor-pointer">
+      <div className="flex items-center gap-3">
+        <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${isIn ? "bg-green-50" : "bg-red-50"}`}>
+          {isIn ? <ArrowDown size={14} className="text-green-600" /> : <ArrowUp size={14} className="text-red-600" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-gray-900 truncate">{data.barang?.name}</h3>
+            <span className="text-[11px] text-gray-400 shrink-0 whitespace-nowrap">{formatDate(data.tanggal)}</span>
           </div>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded ${isIn ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{data.type}</span>
-        </div>
-        <p className="text-xs text-gray-400">{formatDate(data.tanggal)}</p>
-      </div>
-
-      <h3 className="font-semibold text-sm text-gray-900 mb-3">{data.barang?.name}</h3>
-
-      <div className="space-y-1.5 text-xs text-gray-600">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 w-8 shrink-0">Qty</span>
-          <span className="font-semibold text-gray-800">{data.qty}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 w-8 shrink-0">Dari</span>
-          <span className="font-medium truncate">{data.from_employee?.nama || data.from_office?.name || "-"}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 w-8 shrink-0">Ke</span>
-          <span className="font-medium truncate">{data.to_employee?.nama || data.to_office?.name || "-"}</span>
+          <div className="flex items-center justify-between gap-2 mt-0.5">
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="text-xs text-gray-500 truncate">{data.from_employee?.nama || data.from_office?.name || "-"}</span>
+              <span className="text-gray-300 shrink-0">→</span>
+              <span className="text-xs text-gray-500 truncate">{data.to_employee?.nama || data.to_office?.name || "-"}</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-900 shrink-0">{data.qty}</span>
+          </div>
         </div>
       </div>
-
-      {onDelete && (
-        <div className="flex justify-end mt-3 pt-2 border-t border-gray-50">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(data);
-            }}
-            className="flex items-center gap-1 text-red-500 text-xs font-medium"
-          >
-            <Trash2 size={14} />
-            Hapus
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -78,72 +78,76 @@ export default function BarangPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* ================= TOP BAR ================= */}
-      <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-end">
-        {/* SEARCH */}
-        <input type="text" placeholder="Cari barang..." value={params.search} onChange={handleSearch} className="w-full md:w-64 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <div className="p-4 md:p-6 border-b border-gray-100">
+        <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-end">
+          <input type="text" placeholder="Cari barang..." value={params.search} onChange={handleSearch} className="w-full md:w-64 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
-        {/* BUTTON */}
-        <button
-          onClick={() => {
-            setSelected(null);
-            setOpenModal(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow-sm"
-        >
-          + Barang
-        </button>
-      </div>
-
-      {/* ================= CONTENT ================= */}
-
-      {/* MOBILE */}
-      <div className="grid gap-3 md:hidden">
-        {loading ? (
-          <p className="text-center text-gray-500">Loading...</p>
-        ) : data.length ? (
-          data.map((row) => <BarangCard key={row.id} data={row} onDelete={handleDelete} onEdit={handleEdit} />)
-        ) : (
-          <p className="text-center text-gray-500">Belum ada barang</p>
-        )}
-      </div>
-
-      {/* DESKTOP */}
-      <div className="hidden md:block">
-        <div className="overflow-x-auto">
-          <BarangTable data={data} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
+          <button
+            onClick={() => {
+              setSelected(null);
+              setOpenModal(true);
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow-sm"
+          >
+            + Barang
+          </button>
         </div>
       </div>
 
-      {/* ================= PAGINATION ================= */}
+      {/* ================= MOBILE ================= */}
+      <div className="divide-y divide-gray-100 md:hidden">
+        {loading ? (
+          <p className="text-center text-gray-500 px-4 py-8">Loading...</p>
+        ) : data.length ? (
+          data.map((row) => <BarangCard key={row.id} data={row} />)
+        ) : (
+          <p className="text-center text-gray-500 px-4 py-8">Belum ada barang</p>
+        )}
+      </div>
+
+      {/* ================= DESKTOP ================= */}
+      <div className="hidden md:block p-4 md:p-6">
+        <div className="overflow-x-auto">
+          <BarangTable data={data} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
+        </div>
+
+        {meta?.last_page > 1 && (
+          <div className="flex justify-end gap-2 text-sm mt-4">
+            <button
+              disabled={params.page === 1}
+              onClick={() => setParams((prev) => ({ ...prev, page: prev.page - 1 }))}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="px-2 py-1">{meta.current_page} / {meta.last_page}</span>
+            <button
+              disabled={params.page === meta.last_page}
+              onClick={() => setParams((prev) => ({ ...prev, page: prev.page + 1 }))}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ================= MOBILE PAGINATION ================= */}
       {meta?.last_page > 1 && (
-        <div className="flex justify-end gap-2 text-sm">
+        <div className="flex justify-end gap-2 text-sm px-4 py-3 border-t border-gray-100 md:hidden">
           <button
             disabled={params.page === 1}
-            onClick={() =>
-              setParams((prev) => ({
-                ...prev,
-                page: prev.page - 1,
-              }))
-            }
+            onClick={() => setParams((prev) => ({ ...prev, page: prev.page - 1 }))}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
             Prev
           </button>
-
-          <span className="px-2 py-1">
-            {meta.current_page} / {meta.last_page}
-          </span>
-
+          <span className="px-2 py-1">{meta.current_page} / {meta.last_page}</span>
           <button
             disabled={params.page === meta.last_page}
-            onClick={() =>
-              setParams((prev) => ({
-                ...prev,
-                page: prev.page + 1,
-              }))
-            }
+            onClick={() => setParams((prev) => ({ ...prev, page: prev.page + 1 }))}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
             Next

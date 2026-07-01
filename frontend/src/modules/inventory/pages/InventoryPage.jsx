@@ -106,42 +106,43 @@ export default function InventoryPage() {
 
       {/* 🔄 TRANSAKSI */}
       {tab === "transaksi" && (
-        <div className="bg-white p-6 rounded-xl shadow-sm space-y-4">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* ================= TOP BAR ================= */}
-          <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-end">
-            {/* SEARCH */}
-            <input
-              type="text"
-              placeholder="Cari barang..."
-              value={params.search || ""}
-              onChange={(e) =>
-                setParams((prev) => ({
-                  ...prev,
-                  search: e.target.value,
-                  page: 1,
-                }))
-              }
-              className="w-full md:w-80 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="p-4 md:p-6 border-b border-gray-100">
+            <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-end">
+              <input
+                type="text"
+                placeholder="Cari barang..."
+                value={params.search || ""}
+                onChange={(e) =>
+                  setParams((prev) => ({
+                    ...prev,
+                    search: e.target.value,
+                    page: 1,
+                  }))
+                }
+                className="w-full md:w-80 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
-            {/* BUTTON */}
-            <button onClick={() => setOpenModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow-sm">
-              + Transaksi
-            </button>
+              <button onClick={() => setOpenModal(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow-sm">
+                + Transaksi
+              </button>
+            </div>
           </div>
+
           {/* MOBILE */}
-          <div className="grid gap-3 md:hidden">
+          <div className="divide-y divide-gray-100 md:hidden">
             {loading ? (
-              <p className="text-center text-gray-500">Loading...</p>
+              <p className="text-center text-gray-500 px-4 py-8">Loading...</p>
             ) : data.length ? (
-              data.map((row) => <BarangLogCard key={row.id} data={row} onDelete={handleDelete} onClick={() => setSelected(row)} />)
+              data.map((row) => <BarangLogCard key={row.id} data={row} onClick={() => setSelected(row)} />)
             ) : (
-              <p className="text-center text-gray-500">Belum ada transaksi</p>
+              <p className="text-center text-gray-500 px-4 py-8">Belum ada transaksi</p>
             )}
           </div>
 
           {/* DESKTOP */}
-          <div className="hidden md:block">
+          <div className="hidden md:block p-4 md:p-6">
             <div className="overflow-x-auto">
               <BarangLogTable data={data} loading={loading} onDelete={handleDelete} />
             </div>
@@ -162,14 +163,14 @@ export default function InventoryPage() {
 
       {/* 📦 MASTER BARANG */}
       {tab === "barang" && (
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <BarangPage />
         </div>
       )}
 
       {/* 📊 STOK */}
       {tab === "stok" && (
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <StockPage />
         </div>
       )}
