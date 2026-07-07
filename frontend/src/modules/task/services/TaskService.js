@@ -54,7 +54,9 @@ export const deleteTaskPhoto = (photoId) => api.delete(`/task-photos/${photoId}`
 // ============================================
 export const getEmployees = () => api.get("/employees");
 export const getEmployeeOptions = () => api.get("/employees/options");
-export const getOffices = () => api.get("/offices/options");
+export const getOffices = () => api.get("/offices/options", {
+  params: { type: 'child' }
+});
 
 // Re-export getImageUrl agar komponen yang sudah import dari sini tidak perlu ubah
 export { getImageUrl };

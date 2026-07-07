@@ -66,22 +66,24 @@ export default function OfficeForm({ onSubmit, onCancel, initialData }) {
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Parent Office (opsional)</label>
-        <select
-          value={parentOfficeId}
-          onChange={(e) => setParentOfficeId(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Tidak ada parent</option>
-          {officeOptions.map((o) => (
-            <option key={o.id} value={o.id}>{o.name}</option>
-          ))}
-        </select>
-        <p className="text-xs text-gray-400 mt-1">
-          Parent office digunakan untuk menggabungkan stok inventory.
-        </p>
-      </div>
+      {initialData && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Parent Office (opsional)</label>
+          <select
+            value={parentOfficeId}
+            onChange={(e) => setParentOfficeId(e.target.value)}
+            className={inputClass}
+          >
+            <option value="">Tidak ada parent</option>
+            {officeOptions.map((o) => (
+              <option key={o.id} value={o.id}>{o.name}</option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-400 mt-1">
+            Parent office digunakan untuk menggabungkan stok inventory.
+          </p>
+        </div>
+      )}
 
       <div className="flex justify-end gap-3 pt-2">
         <button

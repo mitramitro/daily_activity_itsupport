@@ -22,7 +22,9 @@ export const deleteEmployee = (id) => {
   return api.delete(`/employees/${id}`);
 };
 
-// 🔹 ambil office
+// 🔹 ambil office (hanya child)
 export const getOffices = () => {
-  return api.get("/offices/options");
+  return api.get("/offices/options", {
+    params: { type: 'child' }
+  });
 };

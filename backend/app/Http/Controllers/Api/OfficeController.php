@@ -8,11 +8,15 @@ use Illuminate\Http\Request;
 
 class OfficeController extends Controller
 {
-    public function options()
+    public function options(Request $request)
     {
-        return response()->json(
-            Office::select('id', 'name')->orderBy('name')->get()
-        );
+        $query = Office::select('id', 'name')->orderBy('name');
+
+        if ($request->type === 'child') {
+            $query->whereNotNull('parent_office_id');
+        }
+
+        return response()->json($query->get());
     }
 
     public function index(Request $request)
