@@ -13,7 +13,11 @@ class OfficeController extends Controller
         $query = Office::select('id', 'name')->orderBy('name');
 
         if ($request->type === 'child') {
-            $query->whereNotNull('parent_office_id');
+            $query->whereNotIn('id', function ($q) {
+                $q->select('parent_office_id')
+                    ->from('offices')
+                    ->whereNotNull('parent_office_id');
+            });
         }
 
         return response()->json($query->get());
